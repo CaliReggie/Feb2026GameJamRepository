@@ -471,7 +471,7 @@ MonoBehaviour:
   - {fileID: 886786502274669439}
   - {fileID: 8574344394148916682}
   animator: {fileID: 6103569712182495043}
-  maxArmExtendDistance: 2
+  maxArmExtendDistance: 2.5
   extendDistanceOffset: -0.375
   cursorDetectionLayers:
     serializedVersion: 2
@@ -482,7 +482,7 @@ MonoBehaviour:
   targetSpawnEulerRotation: {x: 0, y: 0, z: 0}
   currentState: 0
   extendArmsPressed: 0
-  targetCursorHitPosition: {x: 0, y: 0, z: 0}
+  <TargetCursorHitWorldPosition>k__BackingField: {x: 0, y: 0, z: 0}
 --- !u!114 &878452189081699859
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -560,8 +560,10 @@ MonoBehaviour:
   <Pio>k__BackingField: {fileID: 0}
   <Initialized>k__BackingField: 0
   cursorPrefab: {fileID: 6838444227996186847, guid: 2bf47dd12c88c604a8f5b2ea483f27db, type: 3}
+  constrainRealMouseInBounds: 1
   pioPlayerInput: {fileID: 0}
   playerUiPioComponent: {fileID: 0}
+  playerObjectPioComponent: {fileID: 0}
   playerUiCanvas: {fileID: 0}
   playerUiCanvasRectTransform: {fileID: 0}
   playerUiDrawCam: {fileID: 0}

@@ -31,6 +31,8 @@ public class GameManagerOver : GameManager.GameManagerState
         
         // show over page
         Context.ToggleOverPage(Context.gameWon, true);
+
+        Context.ToggleWinCountdown(false);
     }
 
     public override void UpdateState()

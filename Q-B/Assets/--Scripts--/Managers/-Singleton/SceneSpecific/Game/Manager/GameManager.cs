@@ -27,6 +27,11 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
     
     public int NumNumPackagesToWin => context.numPackagesToWin;
     
+    public void ToggleWinCountdown(bool shouldBeCounting)
+    {
+        context.ToggleWinCountdown(shouldBeCounting);
+    }
+    
     /// <summary>
     /// Called to end the game and transition to GameOver state.
     /// </summary>
@@ -123,7 +128,7 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         [Tooltip("The root game lost page transform.")]
         public Transform gameLostPage;
         
-        public int numPackagesToWin;
+        public Transform winCountdown;
         
         [Header("Inscribed Settings")]
         
@@ -132,6 +137,8 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         
         [Tooltip("Whether to hide the play page when GameOver.")]
         public bool hidePlayWhenOver;
+        
+        public int numPackagesToWin;
         
         [Header("Dynamic References - Don't Modify In Inspector")]
         
@@ -192,7 +199,8 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
             if (pausePage == null ||
                 playPage == null ||
                 gameWonPage == null ||
-                gameLostPage == null)
+                gameLostPage == null ||
+                winCountdown == null)
             {
                 Debug.LogError($"{GetType().Name}: Error Checking Inscribed References. Destroying self.");
                 
@@ -249,6 +257,11 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
                 gameLostPage.gameObject.SetActive(isActive);
                 gameWonPage.gameObject.SetActive(false);
             }
+        }
+        
+        public void ToggleWinCountdown(bool shouldBeCounting)
+        {
+            winCountdown.gameObject.SetActive(shouldBeCounting);
         }
     }
     

@@ -6,15 +6,16 @@ using UnityEngine.Serialization;
 
 public class DeliveryZone : MonoBehaviour
 {
+    [FormerlySerializedAs("deliveredPackages")]
     [Header("Dynamic Settings")]
     
-    [SerializeField] private List<Package> deliveredPackages;
+    [SerializeField] private List<Package> receivedPackages;
     
     private void Start()
     {
-        if (deliveredPackages == null)
+        if (receivedPackages == null)
         {
-            deliveredPackages = new List<Package>();
+            receivedPackages = new List<Package>();
         }
     }
 
@@ -55,10 +56,7 @@ public class DeliveryZone : MonoBehaviour
             
             if (package != null)
             {
-                if (deliveredPackages.Contains(package))
-                {
-                    deliveredPackages.Remove(package);
-                }
+                RemovePackage(package);
             }
         }
     }
@@ -70,13 +68,31 @@ public class DeliveryZone : MonoBehaviour
             return;
         }
         
-        if (!deliveredPackages.Contains(package))
+        if (!receivedPackages.Contains(package))
         {
-            deliveredPackages.Add(package);
+            receivedPackages.Add(package);
             
-            if (deliveredPackages.Count >= GameManager.Instance.NumNumPackagesToWin)
+            if (receivedPackages.Count >= GameManager.Instance.NumNumPackagesToWin)
             {
-                GameManager.Instance.GameOver(true);
+                GameManager.Instance.ToggleWinCountdown(true);
+            }
+        }
+    }
+    
+    private void RemovePackage(Package package)
+    {
+        if (GameManager.Instance == null)
+        {
+            return;
+        }
+        
+        if (receivedPackages.Contains(package))
+        {
+            receivedPackages.Remove(package);
+            
+            if (receivedPackages.Count <= 0 || receivedPackages.Count < GameManager.Instance.NumNumPackagesToWin)
+            {
+                GameManager.Instance.ToggleWinCountdown(false);
             }
         }
     }

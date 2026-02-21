@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1396496727454285855, guid: cda928bec01b97b45bd5d18fa3c5292e, type: 3}
       propertyPath: m_Name
-      value: MainMenuEnvironment Variant
+      value: MainMenuEnvironment
       objectReference: {fileID: 0}
     - target: {fileID: 2525115233100382911, guid: cda928bec01b97b45bd5d18fa3c5292e, type: 3}
       propertyPath: m_LocalPosition.x

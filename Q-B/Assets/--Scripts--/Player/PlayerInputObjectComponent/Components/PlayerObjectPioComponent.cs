@@ -112,6 +112,11 @@ public class PlayerObjectPioComponent : PioComponent
         extendArmsPressed = extendArmsButtonValue.isPressed;
     }
     
+    public void OnHitHazardZone()
+    {
+        DeSpawn();
+    }
+    
     /// <summary>
     /// Teleports the player object to the target location. Optionally also rotates to match target Euler rotation.
     /// </summary>
