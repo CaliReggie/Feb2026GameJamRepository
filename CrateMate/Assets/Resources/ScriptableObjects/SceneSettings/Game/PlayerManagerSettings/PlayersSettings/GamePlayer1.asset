@@ -14,19 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   writeChanges: 0
   defaultConfiguration:
-    state: 2
+    state: 4
     pauseTime: 0
     cursorConstrained: 0
   alternateConfiguration:
-    state: 3
+    state: 4
     pauseTime: 1
     cursorConstrained: 0
   allowManualSwitching: 1
   useEnvironmentSpawnPoint: 1
   spawnPosition: {x: 0, y: 0, z: 0}
   spawnEulerRotation: {x: -0, y: 0, z: 0}
-  cameraType: 3
+  cameraType: 4
   cameraSensitivity: 1
   persistentPlayerCanvas: 1
-  cursorSprite: {fileID: 21300000, guid: fd542db25eb584841b969bf5c34d5a82, type: 3}
+  cursorSprite: {fileID: 21300000, guid: b98f9b96878253d4b836b68152ce5a42, type: 3}
   currentConfigurationType: 2

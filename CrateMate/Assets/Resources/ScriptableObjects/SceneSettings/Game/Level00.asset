@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2efbdced89e9a90458959f9105eb3295, type: 3}
-  m_Name: BUILDGame
+  m_Name: Level00
   m_EditorClassIdentifier: 
   writeChanges: 0
-  scenePath: Assets/---Scenes---/Example/Game.unity
+  scenePath: Assets/---Scenes---/Example/Level00.unity
   playerManagerSettings: {fileID: 11400000, guid: cfe89334a89791f4ca52fbbd4feeef12, type: 2}
   id: 1
   nameId: 

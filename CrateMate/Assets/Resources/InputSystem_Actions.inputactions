@@ -488,6 +488,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ExtendArms",
+                    "type": "PassThrough",
+                    "id": "96a9e9c5-9212-4641-986f-eac02524da1b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -697,6 +706,28 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "Navigate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a8ece139-338e-44d7-8b3a-687ac3b463c6",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ExtendArms",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "27f0a73c-9a12-42fd-9118-d742e8b7d15c",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "ExtendArms",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

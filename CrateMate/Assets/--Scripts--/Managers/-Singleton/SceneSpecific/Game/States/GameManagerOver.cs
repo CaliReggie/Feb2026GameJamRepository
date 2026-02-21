@@ -30,7 +30,7 @@ public class GameManagerOver : GameManager.GameManagerState
         }
         
         // show over page
-        Context.ToggleOverPage(true);
+        Context.ToggleOverPage(Context.gameWon, true);
     }
 
     public override void UpdateState()
@@ -41,7 +41,7 @@ public class GameManagerOver : GameManager.GameManagerState
     public override void ExitState()
     {
         // hide over page
-        Context.ToggleOverPage(false);
+        Context.ToggleOverPage(Context.gameWon, false);
         
         // resume application time
         if (ApplicationManager.Instance != null)

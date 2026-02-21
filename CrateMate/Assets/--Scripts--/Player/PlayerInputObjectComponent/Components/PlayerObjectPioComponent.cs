@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 
 /// <summary>
@@ -17,9 +19,7 @@ public class PlayerObjectPioComponent : PioComponent
     {
         Inactive,
         Idle,
-        Walking,
-        Jumping,
-        Falling
+        Moving
     }
     
     [Header("Inscribed References")]
@@ -27,33 +27,34 @@ public class PlayerObjectPioComponent : PioComponent
     [Tooltip("The transform of the player object to be controlled by this component.")]
     [SerializeField] private Transform playerObject;
     
+    [SerializeField] private Rigidbody playerObjectRigidbody;
+
+    [SerializeField] private Collider playerObjectCollider;
+    
+    [SerializeField] private Transform playerArmsRootTransform;
+    
+    [SerializeField] private Rigidbody playerArmsRigidbody;
+    
+    [SerializeField] private ConfigurableJoint playerArmsJoint;
+    
+    [SerializeField] private Collider[] playerArmsColliders;
+    
     [Tooltip("The Animator component attached to the player object for state based animations.")]
     [SerializeField] private Animator animator;
-    
+
     [Header("Inscribed Settings")]
     
-    [Tooltip("The speed and which player object will move when move controls are used.")]
-    [SerializeField] private float walkSpeed = 5f;
-    
-    [Tooltip("The real height the player will jump dependant on Physics gravity settings.")]
-    [SerializeField] private float jumpHeight = 2f;
-    
-    [Tooltip("The time after pressing jump that playerObject will still attempt to jump (for jump forgiveness in air)")]
-    [SerializeField] private float jumpBufferDuration = 0.2f;
-    
-    [Tooltip("The time after exiting grounded that playerObject will still attempt to jump (for coyote time)")]
-    [SerializeField] private float jumpCoyoteBufferDuration = 0.2f;
-    
-    [Tooltip("The speed at which the player object will rotate towards target move when in a non-fixed player camera.")]
-    [SerializeField] [Range(0,1)] private float playerRotationEasing = 0.1f;
+    [SerializeField] private float maxArmExtendDistance = 2f;
+
+    [SerializeField] private float extendDistanceOffset = 0f;
+
+    [SerializeField] private LayerMask cursorDetectionLayers;
     
     [Header("Dynamic References - Don't Modify In Inspector")]
     
-    [Tooltip("The CharacterController component from the player object.")]
-    [SerializeField] private CharacterController characterController;
+    [SerializeField] private PlayerCursorPioComponent cursorPioComponentReference;
     
-    [Tooltip("The PlayerCameraPioComponent attached to the PlayerInputObject.")] 
-    [SerializeField] private PlayerCameraPioComponent playerCameraComponent;
+    [SerializeField] private MainCamera mainCameraReference;
     
     [Header("Dynamic Settings - Don't Modify In Inspector")]
     
@@ -63,45 +64,28 @@ public class PlayerObjectPioComponent : PioComponent
     [Tooltip("The target spawn euler rotation for the player object.")]
     [SerializeField] private Vector3 targetSpawnEulerRotation;
     
-    [Tooltip("The raw move input received from players input regardless of view orientation.")]
-    [SerializeField] private Vector3 rawMoveInput;
-    
-    [Tooltip("The move input oriented to the current CurrentLookOrientation.")]
-    [SerializeField] private Vector3 orientedMoveInput;
-    
-    [Tooltip("The target world space move vector the player object will move towards.")]
-    [SerializeField] private Vector3 targetMove;
-    
-    [Tooltip("The target euler rotation the player object will rotate towards.")]
-    [SerializeField] private Vector3 targetEulerRotation;
-    
     [Tooltip("The current state of the player object based on input/player conditions.")]
     [SerializeField] private EPlayerObjectState currentState;
-    
-    [Tooltip("Is the player object currently grounded according to CharacterController.")]
-    [SerializeField] private bool isGrounded;
 
-    [Tooltip("Was the player object grounded last frame according to CharacterController.")]
-    [SerializeField] private bool wasGrounded;
+    [SerializeField] private bool extendArmsPressed;
     
-    [Tooltip("The time left that the player will still attempt to jump.")]
-    [SerializeField] private float jumpBufferTimer;
+    [SerializeField] private Vector3 targetCursorHitPosition;
     
-    [Tooltip("The time left that the player can still attempt to jump if not grounded.")]
-    [SerializeField] private float jumpCoyoteBufferTimer;
+    // extending the x position of joint to using this (difference in position of
+    // root transform and hit point) clamped to maxArmExtendDistance
+    private float TargetArmXExtension => Mathf.Clamp(Vector3.Distance(targetCursorHitPosition, playerArmsRootTransform.position) + extendDistanceOffset, 0f, maxArmExtendDistance);
     
-    /// <summary>
-    /// True if grounded and jump requested within jump buffer time,
-    /// or if not grounded but jump requested within jump buffer time and
-    /// jump coyote time is still active.
-    /// </summary>
-    private bool JumpRequested => isGrounded ? jumpBufferTimer > 0f : 
-        (jumpBufferTimer > 0f && jumpCoyoteBufferTimer > 0f);
-    
-    /// <summary>
-    /// The look orientation transform of current camera view per dynamically set playerCameraComponent.
-    /// </summary>
-    private Transform CurrentLookOrientation => playerCameraComponent.CurrentLookOrientation;
+    // rotating the joint to look at the hit point using the difference in position
+    // of root transform and hit point to get the angle
+    private float TargetArmZRotation
+    {
+        get
+        {
+            Vector3 directionToHit = targetCursorHitPosition - playerArmsRootTransform.position;
+            
+            return -Mathf.Atan2(directionToHit.y, directionToHit.x) * Mathf.Rad2Deg;
+        }
+    }
     
     /// <summary>
     /// The current world position of the player object.
@@ -113,56 +97,27 @@ public class PlayerObjectPioComponent : PioComponent
     /// </summary>
     public Vector3 CurrentObjectEulerRotation => playerObject.rotation.eulerAngles;
     
+    public void OnExtendArms(InputValue extendArmsButtonValue)
+    {
+        extendArmsPressed = extendArmsButtonValue.isPressed;
+    }
+    
     /// <summary>
     /// Teleports the player object to the target location. Optionally also rotates to match target Euler rotation.
     /// </summary>
     public void TpPlayerObject(Vector3 targetPosition, Vector3 targetEulerRotation, bool alsoRotate)
     {
         // if the character controller is enabled and active we have to use its move method
-        if (characterController.enabled && characterController.gameObject.activeSelf)
+        if (playerObject.gameObject.activeSelf)
         {
-            Vector3 currentPosition = playerObject.position;
-                    
-            Vector3 moveVector = targetPosition - currentPosition;
-            
-            characterController.Move(moveVector);
+            playerObjectRigidbody.Move(targetPosition, alsoRotate ? Quaternion.Euler(targetEulerRotation) : playerObject.rotation);
         }
-        // otherwise just set position of player object GameObject
+        // otherwise use transform directly
         else
         {
             playerObject.position = targetPosition;
-        }
-        
-        if (alsoRotate)
-        {
-            // only rotate on y axis
-            targetEulerRotation = new Vector3(0f, targetEulerRotation.y, 0f);
             
-            playerObject.rotation = Quaternion.Euler(targetEulerRotation);
-        }
-    }
-    
-    
-    /// <summary>
-    /// Message to be received from players clone of InputActions when move input is performed.
-    /// </summary>
-    public void OnMove(InputValue value)
-
-    {
-        Vector2 inputValue = value.Get<Vector2>();
-
-        
-        rawMoveInput = new Vector3(inputValue.x, 0f, inputValue.y);
-    }
-
-    /// <summary>
-    /// Message to be received from players clone of InputActions when jump button is pressed.
-    /// </summary>
-    public void OnJump(InputValue buttonValue)
-    {
-        if (buttonValue.isPressed)
-        {
-            jumpBufferTimer = jumpBufferDuration;
+            playerObject.SetPositionAndRotation(targetPosition, alsoRotate ? Quaternion.Euler(targetEulerRotation) : playerObject.rotation);
         }
     }
     
@@ -185,8 +140,14 @@ public class PlayerObjectPioComponent : PioComponent
         bool CheckInscribedReferences()
         {
             if (playerObject == null ||
-
-                animator == null)
+                animator == null ||
+                playerObjectRigidbody == null ||
+                playerObjectCollider == null ||
+                playerArmsRootTransform == null ||
+                playerArmsRigidbody == null ||
+                playerArmsJoint == null ||
+                playerArmsColliders == null ||
+                playerArmsColliders.Contains(null))
             {
                 Debug.LogError($"{GetType().Name}: Error checking inscribed references.");
                 
@@ -201,24 +162,17 @@ public class PlayerObjectPioComponent : PioComponent
         {
             try
             {
-                // get character controller from player object
-                characterController = playerObject.GetComponent<CharacterController>();
+                cursorPioComponentReference = Pio.GetComponent<PlayerCursorPioComponent>();
                 
-                // get player camera component from Pio
-                playerCameraComponent = Pio.GetComponent<PlayerCameraPioComponent>();
+                mainCameraReference = MainCamera.Instance;
                 
-                if (characterController == null ||
-                    playerCameraComponent == null)
-
-
-
+                if (cursorPioComponentReference == null ||
+                    mainCameraReference == null)
                 {
                     Debug.LogError($"{GetType().Name}: Error setting dynamic references.");
                     
                     return false;
                 }
-
-
             }
             catch (Exception e)
             {
@@ -256,8 +210,8 @@ public class PlayerObjectPioComponent : PioComponent
         switch (toState)
         {   
             case PlayerInputObject.EPlayerInputObjectState.Player:
-
             case PlayerInputObject.EPlayerInputObjectState.PlayerUi:
+            case PlayerInputObject.EPlayerInputObjectState.PlayerSceneUi:
                 
                 // if off, activate
                 if (!enabled)
@@ -281,6 +235,15 @@ public class PlayerObjectPioComponent : PioComponent
     /// </summary>
     private void Spawn()
     {
+        // updating ref for main camera here in case of change
+        mainCameraReference = MainCamera.Instance;
+        
+        if (mainCameraReference == null)
+        {
+            Debug.LogError($"{GetType().Name}: No MainCamera instance found in scene.");
+        }
+        
+        
         // on spawn, getting most recent spawn point from player settings SO in case it was changed while despawned
         if (Pio.CurrentPlayerSettings != null)
         {
@@ -311,11 +274,11 @@ public class PlayerObjectPioComponent : PioComponent
                 targetSpawnEulerRotation = Pio.CurrentPlayerSettings.SpawnEulerRotation;
             }
         }
-
-        ResetDynamicSettings();
-
+        
         // teleport to spawn point
         TpPlayerObject(targetSpawnPosition, targetSpawnEulerRotation, true);
+        
+        ResetDynamicSettings();
         
         // turn on player object
         playerObject.gameObject.SetActive(true);
@@ -326,10 +289,10 @@ public class PlayerObjectPioComponent : PioComponent
     /// </summary>
     private void DeSpawn()
     {
-        ResetDynamicSettings();
-        
         // teleport to spawn point
         TpPlayerObject(targetSpawnPosition, targetSpawnEulerRotation, true);
+        
+        ResetDynamicSettings();
         
         // turn off player object
         playerObject.gameObject.SetActive(false);
@@ -341,20 +304,21 @@ public class PlayerObjectPioComponent : PioComponent
     /// </summary>
     private void ResetDynamicSettings()
     {
-        rawMoveInput = Vector3.zero;
-            
-        orientedMoveInput = Vector3.zero;
-            
-        targetMove = Vector3.zero;
-            
-        targetEulerRotation = Vector3.zero;
-            
-        isGrounded = false;
-            
-        jumpBufferTimer = 0f;
+        // arms should always start in the same position relative to the body on spawn
+        targetCursorHitPosition = CurrentObjectPosition;
         
-        jumpCoyoteBufferTimer = 0f;
-
+        // joint needs to be reset
+        playerArmsJoint.targetPosition = Vector3.zero;
+        playerArmsJoint.targetRotation = Quaternion.identity;
+        playerArmsJoint.transform.localPosition = Vector3.zero;
+        playerArmsJoint.transform.localRotation = Quaternion.identity;
+        
+        // rigidbody velocity should be reset
+        playerObjectRigidbody.linearVelocity = Vector3.zero;
+        playerObjectRigidbody.angularVelocity = Vector3.zero;
+        
+        extendArmsPressed = false;
+        
         HandleChangeState(EPlayerObjectState.Idle);
     }
     
@@ -362,171 +326,50 @@ public class PlayerObjectPioComponent : PioComponent
     {
         // cannot move if not initialized
         if (!Initialized) { return; }
-        
-        //move the character controller based on targetMove
-        characterController.Move(Time.fixedDeltaTime * targetMove);
     }
 
     private void Update()
     {
         if (!Initialized) { return; }
+
+        ManageDetectionValues();
         
-        ManageCooldownsAndTimers();
-
-        ManageGrounded();
-
-        ManageOrientedInput();
-
-        ManageTargetMove();
-
-        ManageRotation();
+        ManageJointValues();
         
         ManageState();
         
         return;
         
-        void ManageCooldownsAndTimers()
+        void ManageDetectionValues()
         {
-            // counting down jump cooldowns and timers
-            if (jumpBufferTimer > 0f)
+            if (cursorPioComponentReference.CursorInstance != null)
             {
-                jumpBufferTimer -= Time.deltaTime;
-            }
-            
-            if (jumpCoyoteBufferTimer > 0f)
-            {
-                jumpCoyoteBufferTimer -= Time.deltaTime;
-            }
-        }
-
-        void ManageGrounded()
-        {
-            // sample from player controller
-            isGrounded = characterController.isGrounded;
-            
-            // if just left grounded, start coyote timer
-            if (!isGrounded && wasGrounded && targetMove.y < 0f)
-            {
-                jumpCoyoteBufferTimer = jumpCoyoteBufferDuration;
-            }
-            
-            wasGrounded = isGrounded;
-        }
-
-        void ManageOrientedInput()
-        {
-            // oriented input is raw input relative to look orientation
-            orientedMoveInput = CurrentLookOrientation.forward * rawMoveInput.z + CurrentLookOrientation.right * rawMoveInput.x;
-        
-            // don't allow vertical movement from move input
-            orientedMoveInput.y = 0f;
-        
-            // normalize to prevent faster diagonal movement
-            orientedMoveInput.Normalize();
-        }
-
-        void ManageTargetMove()
-        {
-            // lateral management
-            targetMove.x = orientedMoveInput.x * walkSpeed;
-            
-            targetMove.z = orientedMoveInput.z * walkSpeed;
-            
-            // jump can be requested with variable conditions so check that first
-            if (JumpRequested)
-            {
-                // resetting jump buffers (also resets JumpRequested)
-                jumpBufferTimer = 0f;
-                jumpCoyoteBufferTimer = 0f;
-                // use grav to calc jump height
-                targetMove.y = Mathf.Sqrt(2f * jumpHeight * -Physics.gravity.y); 
-            }
-            // if grounded logic
-            else if (isGrounded)
-            {
-                // if targetMove isn't upward (just jumped), set to small downward force to keep grounded
-                if (targetMove.y <= 0f)
+                // raycast from camera to cursor position to get hit point for arms to reach towards
+                Ray ray = mainCameraReference.Camera.ScreenPointToRay(
+                    cursorPioComponentReference.CursorInstance.transform.position);
+                
+                if (Physics.Raycast(ray, out RaycastHit hitInfo, 10000f, cursorDetectionLayers))
                 {
-                    targetMove.y = -0.1f; //small downward force to keep grounded
+                    targetCursorHitPosition = hitInfo.point;
                 }
             }
-            // if not grounded logic
-            else
-            {
-                targetMove.y += Physics.gravity.y * Time.deltaTime; // add gravity when not grounded
-            }
             
-            // todo: hitting head logic... annoying, look to past
+            
         }
-
-        void ManageRotation()
+        
+        void ManageJointValues()
         {
-            // logic variable based on camera type and if player object should face move direction
-            bool shouldPoFaceMoveDirection = 
-                (playerCameraComponent.CurrentCameraType == PlayerCameraPioComponent.EPlayerCameraType.PlayerThirdOrbit ||
-                 playerCameraComponent.CurrentCameraType == PlayerCameraPioComponent.EPlayerCameraType.MainCamera ||
-                playerCameraComponent.CurrentCameraType == PlayerCameraPioComponent.EPlayerCameraType.PlayerFixed);
-
-            // body faces move direction in certain camera types, otherwise faces look orientation.
-            if (shouldPoFaceMoveDirection)
-            {
-                // don't rotate if no move input
-                if (orientedMoveInput != Vector3.zero)
-                {
-                    //target rot is lerped from playerObject rot to oriented move input dir
-                    targetEulerRotation = 
-                        Quaternion.Lerp(playerObject.rotation, Quaternion.LookRotation(orientedMoveInput), 
-                            playerRotationEasing).eulerAngles;
-                    
-                    
-                    playerObject.rotation = Quaternion.Euler(0f, targetEulerRotation.y, 0f);
-                }
-            }
-            else
-            {
-                // face look orientation dir
-                targetEulerRotation = Quaternion.LookRotation(CurrentLookOrientation.forward).eulerAngles;
+            playerArmsJoint.targetPosition = extendArmsPressed ? new Vector3(TargetArmXExtension, 0f, 0f) : Vector3.zero;
             
-                // only rotate on y axis
-                playerObject.rotation = Quaternion.Euler(0f, targetEulerRotation.y, 0f);
-            }
+            playerArmsJoint.targetRotation = Quaternion.Euler(0f, 0f, TargetArmZRotation - 180);
         }
         
         void ManageState()
         {
             EPlayerObjectState previousState = currentState;
 
-            EPlayerObjectState targetState;
-
-
+            EPlayerObjectState targetState = previousState;
             
-            if (isGrounded)
-            {
-                // if grounded and trying to move walking
-                if (orientedMoveInput.magnitude > 0f)
-                {
-                    targetState = EPlayerObjectState.Walking;
-                }
-                // otherwise idle
-                else
-                {
-                    targetState = EPlayerObjectState.Idle;
-                }
-            }
-            else
-            {
-                // if not grounded and target move is up, jumping
-                if (targetMove.y > 0f)
-                {
-                    targetState = EPlayerObjectState.Jumping;
-                }
-                // otherwise must be falling
-                else
-                {
-                    targetState = EPlayerObjectState.Falling;
-                }
-            }
-
             // change state if needed
             if (targetState != previousState)
             {
@@ -557,13 +400,9 @@ public class PlayerObjectPioComponent : PioComponent
                 break;
             case EPlayerObjectState.Idle:
                 break;
-            case EPlayerObjectState.Walking:
+            case EPlayerObjectState.Moving:
                 // todo: cache animator hashes
                 animator.SetBool("isMoving", false);
-                break;
-            case EPlayerObjectState.Jumping:
-                break;
-            case EPlayerObjectState.Falling:
                 break;
         }
         
@@ -574,12 +413,8 @@ public class PlayerObjectPioComponent : PioComponent
                 break;
             case EPlayerObjectState.Idle:
                 break;
-            case EPlayerObjectState.Walking:
+            case EPlayerObjectState.Moving:
                 animator.SetBool("isMoving", true);
-                break;
-            case EPlayerObjectState.Jumping:
-                break;
-            case EPlayerObjectState.Falling:
                 break;
         }
         

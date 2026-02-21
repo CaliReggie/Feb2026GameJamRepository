@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(RectTransform))]
@@ -24,11 +25,15 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         GameOver
     }
     
+    public int NumNumPackagesToWin => context.numPackagesToWin;
+    
     /// <summary>
     /// Called to end the game and transition to GameOver state.
     /// </summary>
     public void GameOver(bool gameWon)
     {
+        context.gameWon = gameWon;
+        
         context.ContextCallChangeState(EGameState.GameOver);
     }
 
@@ -112,8 +117,13 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         [Tooltip("The root pause page transform.")]
         public Transform pausePage;
         
-        [Tooltip("The root game over page transform.")]
-        public Transform overPage;
+        [Tooltip("The root game lost page transform.")]
+        public Transform gameWonPage;
+        
+        [Tooltip("The root game lost page transform.")]
+        public Transform gameLostPage;
+        
+        public int numPackagesToWin;
         
         [Header("Inscribed Settings")]
         
@@ -128,6 +138,11 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         public GameManager gameManager;
 
         public PlayerInputObject pioReference;
+        
+        [Header("Dynamic Settings - Don't Modify In Inspector")]
+        
+        public bool gameWon;
+        
         #endregion
         
         #region BaseMethods
@@ -176,7 +191,8 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
             
             if (pausePage == null ||
                 playPage == null ||
-                overPage == null)
+                gameWonPage == null ||
+                gameLostPage == null)
             {
                 Debug.LogError($"{GetType().Name}: Error Checking Inscribed References. Destroying self.");
                 
@@ -184,7 +200,7 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
                 
                 return null;
             }
-            
+
             return InitializedStates();
         }
 
@@ -213,25 +229,25 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         
         public void TogglePlayPage(bool isActive)
         {
-            if (playPage != null)
-            {
-                playPage.gameObject.SetActive(isActive);
-            }
+            playPage.gameObject.SetActive(isActive);
         }
         
         public void TogglePausePage(bool isActive)
         {
-            if (pausePage != null)
-            {
-                pausePage.gameObject.SetActive(isActive);
-            }
+            pausePage.gameObject.SetActive(isActive);
         }
         
-        public void ToggleOverPage(bool isActive)
+        public void ToggleOverPage(bool won, bool isActive)
         {
-            if (overPage != null)
+            if (won)
             {
-                overPage.gameObject.SetActive(isActive);
+                gameWonPage.gameObject.SetActive(isActive);
+                gameLostPage.gameObject.SetActive(false);
+            }
+            else
+            {
+                gameLostPage.gameObject.SetActive(isActive);
+                gameWonPage.gameObject.SetActive(false);
             }
         }
     }

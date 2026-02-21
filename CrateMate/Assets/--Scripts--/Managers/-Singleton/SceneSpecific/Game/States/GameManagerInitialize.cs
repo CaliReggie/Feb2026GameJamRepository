@@ -34,7 +34,7 @@ public class GameManagerInitialize : GameManager.GameManagerState
         
         Context.TogglePausePage(false);
 
-        Context.ToggleOverPage(false);
+        Context.ToggleOverPage(false, false);
     }
 
     public override void UpdateState()
