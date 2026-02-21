@@ -35,6 +35,8 @@ public class PlayerCursorPioComponent : PioComponent
     [Tooltip("The PlayerUiPioComponent of the Pio")]
     [SerializeField] private PlayerUiPioComponent playerUiPioComponent;
     
+    [SerializeField] private PlayerObjectPioComponent playerObjectPioComponent;
+    
     [Tooltip("The canvas the cursor will be used on for player ui")]
     [SerializeField] private Canvas playerUiCanvas;
     
@@ -281,6 +283,8 @@ public class PlayerCursorPioComponent : PioComponent
             {
                 // getting PlayerInput ref from Pio
                 pioPlayerInput = GetComponent<PlayerInput>();
+                
+                playerObjectPioComponent = GetComponent<PlayerObjectPioComponent>();
                 
                 // getting PlayerUiPioComponent ref from Pio
                 playerUiPioComponent = GetComponent<PlayerUiPioComponent>();
@@ -590,7 +594,10 @@ public class PlayerCursorPioComponent : PioComponent
     /// </summary>
     private Vector2 ClampedByBounds(Vector2 pos, Vector2 min, Vector2 max)
     {
-        return new Vector2(Mathf.Clamp(pos.x, min.x, max.x), Mathf.Clamp(pos.y, min.y, max.y));
+        // extended logic, using the clamped world position of player object if in relevant state
+        Vector2 loc = new Vector2(Mathf.Clamp(pos.x, min.x, max.x), Mathf.Clamp(pos.y, min.y, max.y));
+        
+        return loc;
     }
     
     /// <summary>
@@ -720,6 +727,26 @@ public class PlayerCursorPioComponent : PioComponent
             else
             {
                 clampedTargetGpPos = ClampedByBounds(targetGpMousePos, mainScreenBounds[0], mainScreenBounds[1]);
+            }
+            
+            if (GameManager.Instance != null && MainCamera.Instance != null)
+            {
+                if (GameManager.Instance.CurrentState.State == GameManager.EGameState.Playing)
+                {
+                    Vector3 unclampedCursorWorldPos = playerObjectPioComponent.TargetCursorHitWorldPosition;
+                    
+                    Vector3 clampedCursorWorldPos = playerObjectPioComponent.ClampedTargetCursorHitWorldPosition;
+                    
+                    if (Vector3.Distance(unclampedCursorWorldPos, clampedCursorWorldPos) > 0.01f)
+                    {
+                        Vector3 unclampedArmDir = (unclampedCursorWorldPos - playerObjectPioComponent.CurrentObjectPosition).normalized;
+                        
+                        Vector3 correctedClampedWorldPos = playerObjectPioComponent.CurrentObjectPosition +
+                                                           unclampedArmDir * Vector3.Distance(playerObjectPioComponent.CurrentObjectPosition, clampedCursorWorldPos);
+                        
+                        clampedTargetGpPos = MainCamera.Instance.Camera.WorldToScreenPoint(correctedClampedWorldPos);
+                    }
+                }
             }
             
             //updating virtual mouse position

@@ -69,11 +69,21 @@ public class PlayerObjectPioComponent : PioComponent
 
     [SerializeField] private bool extendArmsPressed;
     
-    [SerializeField] private Vector3 targetCursorHitPosition;
+    [field: SerializeField] public Vector3 TargetCursorHitWorldPosition { get; private set; }
+    
+    public Vector3 ClampedTargetCursorHitWorldPosition
+    {
+        get
+        {
+            Vector3 directionToHit = TargetCursorHitWorldPosition - playerArmsRootTransform.position;
+            
+            return playerArmsRootTransform.position + Vector3.ClampMagnitude(directionToHit, maxArmExtendDistance);
+        }
+    }
     
     // extending the x position of joint to using this (difference in position of
     // root transform and hit point) clamped to maxArmExtendDistance
-    private float TargetArmXExtension => Mathf.Clamp(Vector3.Distance(targetCursorHitPosition, playerArmsRootTransform.position) + extendDistanceOffset, 0f, maxArmExtendDistance);
+    private float TargetArmXExtension => Mathf.Clamp(Vector3.Distance(TargetCursorHitWorldPosition, playerArmsRootTransform.position) + extendDistanceOffset, 0f, maxArmExtendDistance);
     
     // rotating the joint to look at the hit point using the difference in position
     // of root transform and hit point to get the angle
@@ -81,7 +91,7 @@ public class PlayerObjectPioComponent : PioComponent
     {
         get
         {
-            Vector3 directionToHit = targetCursorHitPosition - playerArmsRootTransform.position;
+            Vector3 directionToHit = TargetCursorHitWorldPosition - playerArmsRootTransform.position;
             
             return -Mathf.Atan2(directionToHit.y, directionToHit.x) * Mathf.Rad2Deg;
         }
@@ -305,7 +315,7 @@ public class PlayerObjectPioComponent : PioComponent
     private void ResetDynamicSettings()
     {
         // arms should always start in the same position relative to the body on spawn
-        targetCursorHitPosition = CurrentObjectPosition;
+        TargetCursorHitWorldPosition = CurrentObjectPosition;
         
         // joint needs to be reset
         playerArmsJoint.targetPosition = Vector3.zero;
@@ -350,7 +360,7 @@ public class PlayerObjectPioComponent : PioComponent
                 
                 if (Physics.Raycast(ray, out RaycastHit hitInfo, 10000f, cursorDetectionLayers))
                 {
-                    targetCursorHitPosition = hitInfo.point;
+                    TargetCursorHitWorldPosition = hitInfo.point;
                 }
             }
             
