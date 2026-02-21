@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Users;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 /// <summary>
@@ -26,6 +27,14 @@ public class PlayerCursorPioComponent : PioComponent
     
     [Tooltip("The prefab to spawn as player cursor")]
     [SerializeField] private GameObject cursorPrefab;
+    
+    [FormerlySerializedAs("forceRealMouseInBounds")]
+    [Header("Inscribed Settings")]
+    
+    [Tooltip("If true, the hardware mouse will be forced to stay within bounds when cursor is active. " +
+             "If false, the hardware mouse can move freely (meaning freely click elsewhere / off bounds), " +
+             "but the cursor will still be clamped to player bounds.")]
+    [SerializeField] private bool constrainRealMouseInBounds = true;
     
     [Header("Dynamic References - Don't Modify In Inspector")]
     
@@ -212,11 +221,11 @@ public class PlayerCursorPioComponent : PioComponent
     {
         cursorPressed = buttonValue.isPressed;
         
-        // hide real mouse when using cursor
-        // if (cursorPressed && enabled && Initialized)
-        // {
-        //     Cursor.visible = false;
-        // }
+        //hide real mouse when using cursor (if constraining hardware mouse in bounds)
+        if (cursorPressed && enabled && Initialized && constrainRealMouseInBounds)
+        {
+            Cursor.visible = false;
+        }
     }
     
     /// <summary>
@@ -305,7 +314,7 @@ public class PlayerCursorPioComponent : PioComponent
                 sceneUiCanvasRectTransform = sceneUiCanvas.GetComponent<RectTransform>();
 
                 // getting cursor constrained setting from player settings
-                // cursorConstrained = Pio.CurrentPlayerSettings.CurrentConfiguration.CursorConstrained;
+                cursorConstrained = Pio.CurrentPlayerSettings.CurrentConfiguration.CursorConstrained;
                 
                 // spawning cursor from prefab if null, starting with gameObject inactive.
                 if (CursorInstance == null)
@@ -523,11 +532,15 @@ public class PlayerCursorPioComponent : PioComponent
     private void ConfigureCursorSettings(CursorLockMode hardwareLockMode, bool hardwareCursorVisible)
     {
         // If managed by player manager, will be handled there
-        if (Pio.IsPlayerManager) return;
+        if (Pio.IsPlayerManager) {return; }
         
-        // Cursor.visible = hardwareCursorVisible;
+        // if not constraining, don't change hardware cursor settings since player can
+        // move freely and click off bounds if they want, otherwise apply settings
+        if (!constrainRealMouseInBounds) { return; }
         
-        // Cursor.lockState = hardwareLockMode;
+        Cursor.visible = hardwareCursorVisible;
+        
+        Cursor.lockState = hardwareLockMode;
     }
     
     /// <summary>
@@ -683,20 +696,25 @@ public class PlayerCursorPioComponent : PioComponent
             //updating cursor position
             AnchorCursor(clampedMousePos);
             
-            // // did real mouse go too far?
-            // bool mouseOffBounds = realMousePos != clampedMousePos;
-            //
-            // if (mouseOffBounds)
-            // {
-            //     // how far is it off
-            //     Vector2 diff = clampedMousePos - realMousePos;
-            //     
-            //     // bring it back that much plus a little extra to avoid getting stuck
-            //     Vector2 warpedCursorPos = clampedMousePos + diff.normalized * 10;
-            //     
-            //     //matching mouse to cursor
-            //     _mouse.WarpCursorPosition(warpedCursorPos);
-            // }
+            if (constrainRealMouseInBounds)
+            {
+                // did real mouse go too far?
+                bool mouseOffBounds = realMousePos != clampedMousePos;
+                
+                if (mouseOffBounds)
+                {
+                    // how far is it off
+                    Vector2 diff = clampedMousePos - realMousePos;
+                    
+                    // bring it back that much plus a little extra to avoid getting stuck
+                    Vector2 warpedCursorPos = clampedMousePos + diff.normalized * 10;
+                    
+                    //matching mouse to cursor
+                    _mouse.WarpCursorPosition(warpedCursorPos);
+                    
+                    realMousePos = warpedCursorPos;
+                }
+            }
         }
         //if player is on gamepad
         else if (pioPlayerInput.currentControlScheme == GamepadScheme)
