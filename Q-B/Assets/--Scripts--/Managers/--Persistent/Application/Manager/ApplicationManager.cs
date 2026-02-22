@@ -249,6 +249,11 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
             // set active scene
             activeSceneSettings = sceneSettingsSo;
             
+            //set target frame rate from scene settings
+            Application.targetFrameRate = activeSceneSettings.TargetFrameRate;
+            
+            Application.targetFrameRate = activeSceneSettings.TargetFrameRate;
+            
             if (applicationManager.DebugMode) { Debug.Log($"Set activeSceneSO to: {sceneSettingsSo.TryGetScenePathAsName()} " +
                                                           $"in {applicationManager.GetType().Name}"); }
         }

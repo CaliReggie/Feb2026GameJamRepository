@@ -195,6 +195,8 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
 
         [Tooltip("The text tip to show / alter to guide players on how to join.")]
         public TextMeshProUGUI playersJoinTipText;
+
+        public TextMeshProUGUI qbPlayersJoinTipText;
         
         [Header("Dynamic References - Don't Modify In Inspector")]
         
@@ -503,6 +505,17 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
         {
             addingPlayersPage.gameObject.SetActive(isActive);
             
+            //qb addition
+            int currNextPlayerNum = NumPlayers + 1;
+            
+            String qbPlayerNeededString =
+                        currNextPlayerNum == 1 ? "" :
+                        currNextPlayerNum == 2 ? "2" :
+                        currNextPlayerNum == 3 ? "3" :
+                        currNextPlayerNum == 4 ? "4" : "Many";
+            
+            qbPlayersJoinTipText.text = $"first {qbPlayerNeededString}Q <b>-</b> B,\n\n\npress enter or start.\n";
+            
             if (isActive)
             {
                 if (playersNeeded > 1)
@@ -513,7 +526,6 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
                         playersNeeded == 4 ? "Four" : "Many";
                     
                     playersNeededText.text = playersNeededString + " Players Needed";
-                    
                     playersJoinTipText.text = "New Players Press \"Enter\" or \"Start\"";
                 }
                 else if (playersNeeded == 1)

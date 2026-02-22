@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   writeChanges: 0
   scenePath: Assets/---Scenes---/Build/CoOpLevel01.unity
+  targetFrameRate: 90
   playerManagerSettings: {fileID: 11400000, guid: c947ddf4a7c236a41b579eb03b83ed4b, type: 2}
   constantId: 4
-  chronologicalId: 101
+  chronologicalId: 201
   nameId: 

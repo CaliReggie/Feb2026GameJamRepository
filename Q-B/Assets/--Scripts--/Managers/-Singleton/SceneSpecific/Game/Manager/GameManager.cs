@@ -139,8 +139,8 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         [Header("Dynamic References - Don't Modify In Inspector")]
         
         public GameManager gameManager;
-
-        public PlayerInputObject pioReference;
+        
+        public PlayerInputObject singlePlayerPioReference;
         
         [Header("Dynamic Settings - Don't Modify In Inspector")]
         
@@ -210,22 +210,6 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
 
         public override void ContextCallChangeState(EGameState newState)
         {
-            if (newState != EGameState.Initialize)
-            {
-                if (PlayerManager.Instance != null)
-                {
-                    pioReference = PlayerManager.Instance.GetPlayer(1);
-                    
-                    if (pioReference == null)
-                    {
-                        Debug.LogError($"{GetType().Name}: No PlayerInputObject found for Player 1. " +
-                                       $"Cannot start Game. Staying in Initialize state.");
-                        
-                        return;
-                    }
-                }
-            }
-            
             gameManager.ChangeState(newState);
         }
         

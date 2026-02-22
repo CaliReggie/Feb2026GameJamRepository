@@ -19,12 +19,12 @@ public class PlayerPrefsButton : MonoBehaviour
     [Header("Inscribed Settings")]
     
     [SerializeField] private int lowestChronologicalIdToUnlock = 0;
-    [SerializeField] private int highestChronologicalIdToUnlock = 99;
+    [SerializeField] private int highestChronologicalIdToUnlock = 999;
     
     [Space]
     
     [SerializeField] private int lowestChronologicalIdToLock = 0;
-    [SerializeField] private int highestChronologicalIdToLock = 99;
+    [SerializeField] private int highestChronologicalIdToLock = 999;
     
     [Header("Dynamic References - Don't Modify In Inspector")]
     

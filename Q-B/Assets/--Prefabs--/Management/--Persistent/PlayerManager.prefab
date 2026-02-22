@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 409134830042893741}
   - component: {fileID: 6069547036995433406}
   m_Layer: 5
-  m_Name: QBJoinTipText
+  m_Name: QBPlayersJoinTipText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -509,6 +509,7 @@ GameObject:
   - component: {fileID: 1442258155622408729}
   - component: {fileID: 3474778202083408181}
   - component: {fileID: 5983628880578553553}
+  - component: {fileID: 4239054282703860851}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -634,6 +635,19 @@ MonoBehaviour:
   sceneToLoadPool: []
   targetChronologicalId: 0
   button: {fileID: 0}
+--- !u!114 &4239054282703860851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4595768274054228863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: {fileID: 0}
 --- !u!1 &5455450357712614310
 GameObject:
   m_ObjectHideFlags: 0
@@ -734,6 +748,7 @@ MonoBehaviour:
     addingPlayersPage: {fileID: 4683496383665503913}
     playersNeededText: {fileID: 4076264683921897188}
     playersJoinTipText: {fileID: 1820858444324329902}
+    qbPlayersJoinTipText: {fileID: 409134830042893741}
     playerManager: {fileID: 0}
     inputManagerComponent: {fileID: 0}
     playerInputObjects: []

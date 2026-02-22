@@ -28,7 +28,7 @@ abstract public class GameManagerListener : MonoBehaviour
             }
             else
             {
-                OnBeforeGameStateChanged(GameManager.EGameState.Initialize);
+                OnAfterGameStateChanged(GameManager.EGameState.Initialize);
             }
         }
     }

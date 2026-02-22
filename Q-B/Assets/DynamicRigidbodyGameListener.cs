@@ -44,11 +44,10 @@ public class DynamicRigidbodyGameListener : GameManagerListener
         
         if (GameManager.Instance.PreviousState != null)
         {
-            switch (GameManager.Instance.PreviousState.State)
+            if (GameManager.Instance.PreviousState.State == GameManager.EGameState.Initialize &&
+                toState == GameManager.EGameState.Playing)
             {
-                case GameManager.EGameState.Initialize:
-                    SetRbDynamic();
-                    break;
+                SetRbDynamic();
             }
         }
     }

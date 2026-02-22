@@ -12,13 +12,13 @@ public class GameManagerInitialize : GameManager.GameManagerState
 
     public override void EnterState()
     {
-        // assigning pioReference if no player manager
+        // assigning singlePlayerPioReference if no player manager
         if (PlayerManager.Instance == null)
         {
-            Context.pioReference = Object.FindAnyObjectByType<PlayerInputObject>();
+            Context.singlePlayerPioReference = Object.FindAnyObjectByType<PlayerInputObject>();
             
             // if didn't find a player log error need a player input object to manage inputs
-            if (Context.pioReference == null) 
+            if (Context.singlePlayerPioReference == null) 
             {
                 Debug.LogError($"{GetType().Name}: No PlayerManager found and" +
                                $" no PlayerInputObject found in scene. Destroying self.");
@@ -49,7 +49,7 @@ public class GameManagerInitialize : GameManager.GameManagerState
         }
         // if no player manager, just start playing
         else if (PlayerManager.Instance == null &&
-                 Context.pioReference != null)
+                 Context.singlePlayerPioReference != null)
         {
             Context.ContextCallChangeState(GameManager.EGameState.Playing);
         }

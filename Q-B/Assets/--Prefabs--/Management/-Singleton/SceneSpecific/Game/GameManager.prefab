@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 4438955885841351940}
   - component: {fileID: 5541430352641954003}
   - component: {fileID: 3137058544192863856}
+  - component: {fileID: 1276223569503223176}
   m_Layer: 5
   m_Name: MainMenuButton
   m_TagString: Untagged
@@ -274,6 +275,19 @@ MonoBehaviour:
   sceneToLoadPool:
   - {fileID: 11400000, guid: c6ab5079b166b8d43b299bcf6977db82, type: 2}
   targetChronologicalId: 0
+  button: {fileID: 0}
+--- !u!114 &1276223569503223176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669852177596485051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &714705842006895895
 GameObject:
@@ -598,6 +612,7 @@ GameObject:
   - component: {fileID: 7329369732343653333}
   - component: {fileID: 5539973120392797052}
   - component: {fileID: 3379304379546350639}
+  - component: {fileID: 6056413509753202111}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -722,6 +737,19 @@ MonoBehaviour:
   buttonBehaviour: 5
   sceneToLoadPool: []
   targetChronologicalId: 0
+  button: {fileID: 0}
+--- !u!114 &6056413509753202111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1304303900137866212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &1898382519214489287
 GameObject:
@@ -1570,6 +1598,7 @@ GameObject:
   - component: {fileID: 6378750878809704834}
   - component: {fileID: 9102247855817254378}
   - component: {fileID: 71811147137196959}
+  - component: {fileID: 6357864901002838506}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -1694,6 +1723,19 @@ MonoBehaviour:
   buttonBehaviour: 5
   sceneToLoadPool: []
   targetChronologicalId: 0
+  button: {fileID: 0}
+--- !u!114 &6357864901002838506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3019684515731197778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &3139094703579758926
 GameObject:
@@ -2094,10 +2136,10 @@ MonoBehaviour:
     gameWonPage: {fileID: 8414663880872839958}
     gameLostPage: {fileID: 2142953355153566008}
     winCountdown: {fileID: 3349407071114746384}
-    hidePlayWhenPaused: 0
-    hidePlayWhenOver: 0
+    hidePlayWhenPaused: 1
+    hidePlayWhenOver: 1
     gameManager: {fileID: 0}
-    pioReference: {fileID: 0}
+    singlePlayerPioReference: {fileID: 0}
     gameWon: 0
 --- !u!1 &4405878145042375368
 GameObject:
@@ -2385,6 +2427,7 @@ GameObject:
   - component: {fileID: 1023014864764202131}
   - component: {fileID: 5799068619213837141}
   - component: {fileID: 2999469876380918310}
+  - component: {fileID: 1500867512439524387}
   m_Layer: 5
   m_Name: NextButton
   m_TagString: Untagged
@@ -2509,8 +2552,23 @@ MonoBehaviour:
   buttonBehaviour: 2
   sceneToLoadPool:
   - {fileID: 11400000, guid: c6ab5079b166b8d43b299bcf6977db82, type: 2}
-  - {fileID: 11400000, guid: a3e0c1e680d9c1f449723f4bb9e29501, type: 2}
+  - {fileID: 11400000, guid: 6f33f32e53fdb224bbc9a753a095e103, type: 2}
+  - {fileID: 11400000, guid: 9c4becafb5e57bd44bd1b45c4dc32700, type: 2}
+  - {fileID: 11400000, guid: e0f14f72422707748bfeae8fced7c3fe, type: 2}
   targetChronologicalId: 0
+  button: {fileID: 0}
+--- !u!114 &1500867512439524387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5090409477707369280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &5349414276551835103
 GameObject:
@@ -2525,6 +2583,7 @@ GameObject:
   - component: {fileID: 5686503227196651470}
   - component: {fileID: 1367717729090017440}
   - component: {fileID: 3007881973687776009}
+  - component: {fileID: 4918786401221678465}
   m_Layer: 5
   m_Name: ResetButton
   m_TagString: Untagged
@@ -2650,6 +2709,19 @@ MonoBehaviour:
   sceneToLoadPool: []
   targetChronologicalId: 0
   button: {fileID: 0}
+--- !u!114 &4918786401221678465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5349414276551835103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: {fileID: 0}
 --- !u!1 &5787044113941720839
 GameObject:
   m_ObjectHideFlags: 0
@@ -2663,6 +2735,7 @@ GameObject:
   - component: {fileID: 5184056860044639919}
   - component: {fileID: 396046892198392465}
   - component: {fileID: 2278074099763026760}
+  - component: {fileID: 5478427429593202247}
   m_Layer: 5
   m_Name: RestartButton
   m_TagString: Untagged
@@ -2788,6 +2861,19 @@ MonoBehaviour:
   sceneToLoadPool: []
   targetChronologicalId: 0
   button: {fileID: 0}
+--- !u!114 &5478427429593202247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5787044113941720839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: {fileID: 0}
 --- !u!1 &5833547598650556011
 GameObject:
   m_ObjectHideFlags: 0
@@ -2801,6 +2887,7 @@ GameObject:
   - component: {fileID: 3148005934903304754}
   - component: {fileID: 8060527999682961857}
   - component: {fileID: 1152717173123502038}
+  - component: {fileID: 9191468128657603734}
   m_Layer: 5
   m_Name: MainMenuButton
   m_TagString: Untagged
@@ -2926,6 +3013,19 @@ MonoBehaviour:
   sceneToLoadPool:
   - {fileID: 11400000, guid: c6ab5079b166b8d43b299bcf6977db82, type: 2}
   targetChronologicalId: 0
+  button: {fileID: 0}
+--- !u!114 &9191468128657603734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5833547598650556011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &6065868396250072838
 GameObject:
@@ -3076,6 +3176,7 @@ GameObject:
   - component: {fileID: 9146789759530983087}
   - component: {fileID: 8467353161718434295}
   - component: {fileID: 3533885691251339768}
+  - component: {fileID: 2344775732601817296}
   m_Layer: 5
   m_Name: ResetButton
   m_TagString: Untagged
@@ -3201,6 +3302,19 @@ MonoBehaviour:
   sceneToLoadPool: []
   targetChronologicalId: 0
   button: {fileID: 0}
+--- !u!114 &2344775732601817296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6490369212595459001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: {fileID: 0}
 --- !u!1 &6512681043461766749
 GameObject:
   m_ObjectHideFlags: 0
@@ -3214,6 +3328,7 @@ GameObject:
   - component: {fileID: 6712516937712046880}
   - component: {fileID: 86092068496892485}
   - component: {fileID: 6363437682791114593}
+  - component: {fileID: 1039616776384333893}
   m_Layer: 5
   m_Name: MainMenuButton
   m_TagString: Untagged
@@ -3340,6 +3455,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c6ab5079b166b8d43b299bcf6977db82, type: 2}
   targetChronologicalId: 0
   button: {fileID: 0}
+--- !u!114 &1039616776384333893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6512681043461766749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: {fileID: 0}
 --- !u!1 &6632363597568577321
 GameObject:
   m_ObjectHideFlags: 0
@@ -3417,6 +3545,7 @@ GameObject:
   - component: {fileID: 2468977220741232062}
   - component: {fileID: 5170738028186405936}
   - component: {fileID: 8851617393004395519}
+  - component: {fileID: 4490510280301397217}
   m_Layer: 5
   m_Name: UnpauseButton
   m_TagString: Untagged
@@ -3541,6 +3670,19 @@ MonoBehaviour:
   buttonBehaviour: 4
   sceneToLoadPool: []
   targetChronologicalId: 0
+  button: {fileID: 0}
+--- !u!114 &4490510280301397217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7113225639733619060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &7631294664743668322
 GameObject:
@@ -4303,6 +4445,7 @@ GameObject:
   - component: {fileID: 1673385898189112473}
   - component: {fileID: 9217099529918999939}
   - component: {fileID: 8297735288593705401}
+  - component: {fileID: 4655672577222587329}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -4427,6 +4570,19 @@ MonoBehaviour:
   buttonBehaviour: 5
   sceneToLoadPool: []
   targetChronologicalId: 0
+  button: {fileID: 0}
+--- !u!114 &4655672577222587329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9117901119158166245}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &9135684168906131449
 GameObject:

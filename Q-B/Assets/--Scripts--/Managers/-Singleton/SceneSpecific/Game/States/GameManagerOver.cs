@@ -40,6 +40,14 @@ public class GameManagerOver : GameManager.GameManagerState
         Context.ToggleOverPage(Context.gameWon, true);
 
         Context.ToggleWinCountdown(false);
+        
+        if (AudioManager.Instance != null)
+        {
+            if (!Context.gameWon)
+            {
+                AudioManager.Instance.PlaySfxOneShot(AudioManager.Instance.LoseSfx, .75f);
+            }
+        }
     }
 
     public override void UpdateState()

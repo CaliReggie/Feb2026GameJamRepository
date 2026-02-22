@@ -29,6 +29,13 @@ public static class PlayerPrefsManager
             return true; // First two scenes are always unlocked
         }
         
+        // adding something else for co op, where i'm starting those at 201
+        
+        if (chronologicalId == 201)
+        {
+            return true; // First co op scene is always unlocked
+        }
+        
         int previousSceneScore = GetSceneBestScore(chronologicalId - 1);
         
         return previousSceneScore >= 0;

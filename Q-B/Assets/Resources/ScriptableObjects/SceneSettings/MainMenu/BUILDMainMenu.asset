@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   writeChanges: 0
   scenePath: Assets/---Scenes---/Build/MainMenu.unity
+  targetFrameRate: 90
   playerManagerSettings: {fileID: 11400000, guid: 637227840297d493aa8e699669a7466c, type: 2}
   constantId: 0
   chronologicalId: 0

@@ -66,6 +66,8 @@ public class PlayerObjectPioComponent : PioComponent
     [SerializeField] private EPlayerObjectState currentState;
 
     [SerializeField] private bool extendArmsPressed;
+
+    [SerializeField] private bool wasExtendArmsPressed;
     
     [field: SerializeField] public Vector3 TargetCursorHitWorldPosition { get; private set; }
     
@@ -108,6 +110,23 @@ public class PlayerObjectPioComponent : PioComponent
     public void OnExtendArms(InputValue extendArmsButtonValue)
     {
         extendArmsPressed = extendArmsButtonValue.isPressed;
+        
+        // if starting extend or retract, playing audio
+        if (AudioManager.Instance != null)
+        {
+            if (extendArmsPressed && !wasExtendArmsPressed)
+            {
+                AudioManager.Instance.PlaySfxOneShot(AudioManager.Instance.ExtendArmsSfx, 1f,
+                    playerObject.position);
+            }
+            else if (!extendArmsPressed && wasExtendArmsPressed)
+            {
+                AudioManager.Instance.PlaySfxOneShot(AudioManager.Instance.RetractArmsSfx, 1f,
+                    playerObject.position);
+            }
+        }
+        
+        wasExtendArmsPressed = extendArmsPressed;
     }
     
     public void OnHitHazardZone()
@@ -331,6 +350,7 @@ public class PlayerObjectPioComponent : PioComponent
         playerObjectRigidbody.angularVelocity = Vector3.zero;
         
         extendArmsPressed = false;
+        wasExtendArmsPressed = false;
         
         HandleChangeState(EPlayerObjectState.Idle);
     }

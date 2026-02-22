@@ -31,6 +31,11 @@ public class GameManagerPaused : GameManager.GameManagerState
         {
             Time.timeScale = 0f;
         }
+        
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySfxOneShot(AudioManager.Instance.PauseSfx, 1);
+        }
     }
 
     public override void UpdateState()
@@ -65,9 +70,9 @@ public class GameManagerPaused : GameManager.GameManagerState
                 }
             }
             // if no player manager exists, attempt working with possible standalone Player Input Object
-            else if (Context.pioReference != null)
+            else if (Context.singlePlayerPioReference != null)
             {
-                PlayerSettingsSO playerSettings = Context.pioReference.CurrentPlayerSettings;
+                PlayerSettingsSO playerSettings = Context.singlePlayerPioReference.CurrentPlayerSettings;
             
                 if (playerSettings.NeedToSeeScenePauseUi)
                 {
@@ -91,6 +96,11 @@ public class GameManagerPaused : GameManager.GameManagerState
         else
         {
             Time.timeScale = 1f;
+        }
+        
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySfxOneShot(AudioManager.Instance.PauseSfx, 1);
         }
     }
 }

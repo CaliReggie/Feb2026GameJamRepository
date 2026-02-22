@@ -746,29 +746,29 @@ public class PlayerCursorPioComponent : PioComponent
             {
                 clampedTargetGpPos = ClampedByBounds(targetGpMousePos, mainScreenBounds[0], mainScreenBounds[1]);
             }
-            
-            if (GameManager.Instance != null && MainCamera.Instance != null)
-            {
-                if (GameManager.Instance.CurrentState.State == GameManager.EGameState.Playing)
-                {
-                    Vector3 unclampedCursorWorldPos = playerObjectPioComponent.TargetCursorHitWorldPosition;
-                    
-                    Vector3 clampedCursorWorldPos = playerObjectPioComponent.ClampedTargetCursorHitWorldPosition;
-                    
-                    if (Vector3.Distance(unclampedCursorWorldPos, clampedCursorWorldPos) > 0.01f)
-                    {
-                        Vector3 playerObjectPos = playerObjectPioComponent.CurrentObjectPosition;
-                        
-                        Vector3 direction = (clampedCursorWorldPos - playerObjectPos).normalized;
-                        
-                        float distance = Vector3.Distance(playerObjectPos, clampedCursorWorldPos);
-                        
-                        Vector3 correctedLocation = playerObjectPos + direction * distance;
-                        
-                        clampedTargetGpPos = MainCamera.Instance.Camera.WorldToScreenPoint( correctedLocation);
-                    }
-                }
-            }
+            //
+            // if (GameManager.Instance != null && MainCamera.Instance != null)
+            // {
+            //     if (GameManager.Instance.CurrentState.State == GameManager.EGameState.Playing)
+            //     {
+            //         Vector3 unclampedCursorWorldPos = playerObjectPioComponent.TargetCursorHitWorldPosition;
+            //         
+            //         Vector3 clampedCursorWorldPos = playerObjectPioComponent.ClampedTargetCursorHitWorldPosition;
+            //         
+            //         if (Vector3.Distance(unclampedCursorWorldPos, clampedCursorWorldPos) > 0.01f)
+            //         {
+            //             Vector3 playerObjectPos = playerObjectPioComponent.CurrentObjectPosition;
+            //             
+            //             Vector3 direction = (clampedCursorWorldPos - playerObjectPos).normalized;
+            //             
+            //             float distance = Vector3.Distance(playerObjectPos, clampedCursorWorldPos);
+            //             
+            //             Vector3 correctedLocation = playerObjectPos + direction * distance;
+            //             
+            //             clampedTargetGpPos = MainCamera.Instance.Camera.WorldToScreenPoint( correctedLocation);
+            //         }
+            //     }
+            // }
             
             //updating virtual mouse position
             InputState.Change(_mouse.position, clampedTargetGpPos);

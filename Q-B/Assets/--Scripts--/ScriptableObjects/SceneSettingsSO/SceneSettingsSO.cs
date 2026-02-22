@@ -54,6 +54,10 @@ public class SceneSettingsSO : ScriptableObject
              "This is set automatically when assigning a SceneAsset in the inspector.")]
     [SerializeField] private string scenePath;
     
+    [Tooltip("The target frame rate for this scene." +
+             " This is set on scene load and can be used to optimize performance for different scenes.")]
+    [SerializeField] private int targetFrameRate = 90;
+    
     [Header("Players Settings")] 
     
     [Tooltip("The player manager settings for this scene.")]
@@ -105,13 +109,17 @@ public class SceneSettingsSO : ScriptableObject
     #endregion
 
     #region Properties
+    
+    /// <summary>
+    /// The target frame rate for this scene.
+    /// This is set on scene load and can be used to optimize performance for different scenes.
+    /// </summary>
+    public int TargetFrameRate => targetFrameRate;
 
     /// <summary>
     /// The player manager settings for this scene.
     /// </summary>
     public PlayerManagerSettingsSO PlayerManagerSettings => playerManagerSettings;
-
-    #endregion
     
     /// <summary>
     /// The constant id of the scene, which should be unique from existing ConstantIds and never changed after creation.
@@ -131,6 +139,8 @@ public class SceneSettingsSO : ScriptableObject
     /// If left empty, the chronologicalId will be used as the name.
     /// </summary>
     public string Name => string.IsNullOrEmpty(nameId) ? $"{constantId}" : nameId;
+
+    #endregion
     
     
 

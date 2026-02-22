@@ -75,6 +75,7 @@ GameObject:
   - component: {fileID: 3510358512852965139}
   - component: {fileID: 2514492928827052211}
   - component: {fileID: 421994915770055519}
+  - component: {fileID: 4167376997224040137}
   m_Layer: 5
   m_Name: RestartButton
   m_TagString: Untagged
@@ -199,6 +200,19 @@ MonoBehaviour:
   buttonBehaviour: 1
   sceneToLoadPool: []
   targetChronologicalId: 0
+  button: {fileID: 0}
+--- !u!114 &4167376997224040137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 440491169387182739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &839739522410471996
 GameObject:
@@ -584,6 +598,7 @@ MonoBehaviour:
   targetSpawnEulerRotation: {x: 0, y: 0, z: 0}
   currentState: 0
   extendArmsPressed: 0
+  wasExtendArmsPressed: 0
   <TargetCursorHitWorldPosition>k__BackingField: {x: 0, y: 0, z: 0}
 --- !u!114 &878452189081699859
 MonoBehaviour:
@@ -858,6 +873,7 @@ GameObject:
   - component: {fileID: 6947926063141570799}
   - component: {fileID: 2494116630529940878}
   - component: {fileID: 7480917294584015781}
+  - component: {fileID: 8462442054319471592}
   m_Layer: 5
   m_Name: UnpauseButton
   m_TagString: Untagged
@@ -980,6 +996,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonBehaviour: 0
+  button: {fileID: 0}
+--- !u!114 &8462442054319471592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2423652596053002184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &2794716631315922389
 GameObject:
@@ -1858,6 +1887,7 @@ GameObject:
   - component: {fileID: 5950077214555892184}
   - component: {fileID: 6004431801077595427}
   - component: {fileID: 7649504546331714367}
+  - component: {fileID: 7799432427717281452}
   m_Layer: 5
   m_Name: MainMenuButton
   m_TagString: Untagged
@@ -1983,6 +2013,19 @@ MonoBehaviour:
   sceneToLoadPool:
   - {fileID: 11400000, guid: c6ab5079b166b8d43b299bcf6977db82, type: 2}
   targetChronologicalId: 0
+  button: {fileID: 0}
+--- !u!114 &7799432427717281452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6250879866309469690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &6496518421730638921
 GameObject:
@@ -2494,6 +2537,7 @@ GameObject:
   - component: {fileID: 78607551175262242}
   - component: {fileID: 1358565307570350603}
   - component: {fileID: 4243271988343291914}
+  - component: {fileID: 6160218434565697647}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -2618,6 +2662,19 @@ MonoBehaviour:
   buttonBehaviour: 5
   sceneToLoadPool: []
   targetChronologicalId: 0
+  button: {fileID: 0}
+--- !u!114 &6160218434565697647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7794149975393711850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1092e55fcae1eb4a81371134094b21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   button: {fileID: 0}
 --- !u!1 &7840824986471102604
 GameObject:
@@ -3974,6 +4031,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7ac21b7f0ac76794f98e4ea3a7e3c8a6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2132538732326946503}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7ac21b7f0ac76794f98e4ea3a7e3c8a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7384542872537149219}
   m_SourcePrefab: {fileID: 100100000, guid: 7ac21b7f0ac76794f98e4ea3a7e3c8a6, type: 3}
 --- !u!4 &7367829500856439616 stripped
 Transform:
@@ -4073,3 +4133,17 @@ MonoBehaviour:
   initialPosition: {x: 0, y: 0, z: 0}
   initialRotation: {x: 0, y: 0, z: 0, w: 0}
   initiallyKinematic: 0
+--- !u!114 &7384542872537149219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7886956651415161338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d491449b4f889c4ab9424bbb4968b7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sfxType: 1
+  velocityRange: {x: 0.1, y: 10}
