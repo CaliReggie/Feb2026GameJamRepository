@@ -757,12 +757,15 @@ public class PlayerCursorPioComponent : PioComponent
                     
                     if (Vector3.Distance(unclampedCursorWorldPos, clampedCursorWorldPos) > 0.01f)
                     {
-                        Vector3 unclampedArmDir = (unclampedCursorWorldPos - playerObjectPioComponent.CurrentObjectPosition).normalized;
+                        Vector3 playerObjectPos = playerObjectPioComponent.CurrentObjectPosition;
                         
-                        Vector3 correctedClampedWorldPos = playerObjectPioComponent.CurrentObjectPosition +
-                                                           unclampedArmDir * Vector3.Distance(playerObjectPioComponent.CurrentObjectPosition, clampedCursorWorldPos);
+                        Vector3 direction = (clampedCursorWorldPos - playerObjectPos).normalized;
                         
-                        clampedTargetGpPos = MainCamera.Instance.Camera.WorldToScreenPoint(correctedClampedWorldPos);
+                        float distance = Vector3.Distance(playerObjectPos, clampedCursorWorldPos);
+                        
+                        Vector3 correctedLocation = playerObjectPos + direction * distance;
+                        
+                        clampedTargetGpPos = MainCamera.Instance.Camera.WorldToScreenPoint( correctedLocation);
                     }
                 }
             }

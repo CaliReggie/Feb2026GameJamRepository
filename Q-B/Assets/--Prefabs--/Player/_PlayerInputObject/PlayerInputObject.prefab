@@ -566,7 +566,7 @@ MonoBehaviour:
   playerObject: {fileID: 7367829500856439616}
   playerObjectRigidbody: {fileID: 7003406886653929236}
   playerObjectCollider: {fileID: 3168528633483839912}
-  playerArmsRootTransform: {fileID: 334459256759132218}
+  <PlayerArmsRootTransform>k__BackingField: {fileID: 334459256759132218}
   playerArmsRigidbody: {fileID: 2075578495113835085}
   playerArmsJoint: {fileID: 8652239732896449591}
   playerArmsColliders:
@@ -3941,7 +3941,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 7ac21b7f0ac76794f98e4ea3a7e3c8a6, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3971,6 +3971,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7ac21b7f0ac76794f98e4ea3a7e3c8a6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6103569712182495043}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7ac21b7f0ac76794f98e4ea3a7e3c8a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2132538732326946503}
   m_SourcePrefab: {fileID: 100100000, guid: 7ac21b7f0ac76794f98e4ea3a7e3c8a6, type: 3}
 --- !u!4 &7367829500856439616 stripped
 Transform:
@@ -4053,3 +4056,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2132538732326946503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7886956651415161338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 861f0ec80ba87794488d13c0bc8afda1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialized: 0
+  rb: {fileID: 0}
+  initialPosition: {x: 0, y: 0, z: 0}
+  initialRotation: {x: 0, y: 0, z: 0, w: 0}
+  initiallyKinematic: 0

@@ -2,8 +2,6 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
-
 
 /// <summary>
 /// The PlayerObjectPioComponent extends PioComponent to manage the player object GameObject. Includes a basic
@@ -31,7 +29,7 @@ public class PlayerObjectPioComponent : PioComponent
 
     [SerializeField] private Collider playerObjectCollider;
     
-    [SerializeField] private Transform playerArmsRootTransform;
+    [field: SerializeField] public Transform PlayerArmsRootTransform { get; private set; }
     
     [SerializeField] private Rigidbody playerArmsRigidbody;
     
@@ -75,15 +73,15 @@ public class PlayerObjectPioComponent : PioComponent
     {
         get
         {
-            Vector3 directionToHit = TargetCursorHitWorldPosition - playerArmsRootTransform.position;
+            Vector3 directionToHit = TargetCursorHitWorldPosition - PlayerArmsRootTransform.position;
             
-            return playerArmsRootTransform.position + Vector3.ClampMagnitude(directionToHit, maxArmExtendDistance);
+            return PlayerArmsRootTransform.position + Vector3.ClampMagnitude(directionToHit, maxArmExtendDistance);
         }
     }
     
     // extending the x position of joint to using this (difference in position of
     // root transform and hit point) clamped to maxArmExtendDistance
-    private float TargetArmXExtension => Mathf.Clamp(Vector3.Distance(TargetCursorHitWorldPosition, playerArmsRootTransform.position) + extendDistanceOffset, 0f, maxArmExtendDistance);
+    private float TargetArmXExtension => Mathf.Clamp(Vector3.Distance(TargetCursorHitWorldPosition, PlayerArmsRootTransform.position) + extendDistanceOffset, 0f, maxArmExtendDistance);
     
     // rotating the joint to look at the hit point using the difference in position
     // of root transform and hit point to get the angle
@@ -91,7 +89,7 @@ public class PlayerObjectPioComponent : PioComponent
     {
         get
         {
-            Vector3 directionToHit = TargetCursorHitWorldPosition - playerArmsRootTransform.position;
+            Vector3 directionToHit = TargetCursorHitWorldPosition - PlayerArmsRootTransform.position;
             
             return -Mathf.Atan2(directionToHit.y, directionToHit.x) * Mathf.Rad2Deg;
         }
@@ -158,7 +156,7 @@ public class PlayerObjectPioComponent : PioComponent
                 animator == null ||
                 playerObjectRigidbody == null ||
                 playerObjectCollider == null ||
-                playerArmsRootTransform == null ||
+                PlayerArmsRootTransform == null ||
                 playerArmsRigidbody == null ||
                 playerArmsJoint == null ||
                 playerArmsColliders == null ||
@@ -346,6 +344,12 @@ public class PlayerObjectPioComponent : PioComponent
     private void Update()
     {
         if (!Initialized) { return; }
+        
+        if (GameManager.Instance != null &&
+            GameManager.Instance.CurrentState.State != GameManager.EGameState.Playing)
+        {
+            return;
+        }
 
         ManageDetectionValues();
         

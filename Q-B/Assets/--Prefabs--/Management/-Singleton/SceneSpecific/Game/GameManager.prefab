@@ -2509,9 +2509,7 @@ MonoBehaviour:
   buttonBehaviour: 2
   sceneToLoadPool:
   - {fileID: 11400000, guid: c6ab5079b166b8d43b299bcf6977db82, type: 2}
-  - {fileID: 11400000, guid: 6f33f32e53fdb224bbc9a753a095e103, type: 2}
-  - {fileID: 11400000, guid: 9c4becafb5e57bd44bd1b45c4dc32700, type: 2}
-  - {fileID: 11400000, guid: e0f14f72422707748bfeae8fced7c3fe, type: 2}
+  - {fileID: 11400000, guid: a3e0c1e680d9c1f449723f4bb9e29501, type: 2}
   targetChronologicalId: 0
   button: {fileID: 0}
 --- !u!1 &5349414276551835103
