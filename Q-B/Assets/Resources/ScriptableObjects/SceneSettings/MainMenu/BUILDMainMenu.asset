@@ -15,5 +15,6 @@ MonoBehaviour:
   writeChanges: 0
   scenePath: Assets/---Scenes---/Build/MainMenu.unity
   playerManagerSettings: {fileID: 11400000, guid: 637227840297d493aa8e699669a7466c, type: 2}
-  id: 0
+  constantId: 0
+  chronologicalId: 0
   nameId: 

@@ -25,8 +25,6 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         GameOver
     }
     
-    public int NumNumPackagesToWin => context.numPackagesToWin;
-    
     public void ToggleWinCountdown(bool shouldBeCounting)
     {
         context.ToggleWinCountdown(shouldBeCounting);
@@ -137,8 +135,6 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         
         [Tooltip("Whether to hide the play page when GameOver.")]
         public bool hidePlayWhenOver;
-        
-        public int numPackagesToWin;
         
         [Header("Dynamic References - Don't Modify In Inspector")]
         

@@ -61,15 +61,17 @@ public class SceneSettingsSO : ScriptableObject
     
     [Header("Level Settings")] 
     
-    [Tooltip("The chronological id of the scene. 0 is default and reserved for main menu, 1 for first level, etc. " +
-             "Negative values can be implemented for special uses.")]
-    [SerializeField] private int id = -1;
+    [Tooltip("The id of the scene to be set on creation, must be different that any other existing constantId, " +
+             "and then NEVER CHANGED. This is for application structure purposes and does not affect loading.")]
+    [SerializeField] private int constantId = -1;
     
-    [Tooltip("The name of the scene. If left empty, the id will be used as the name." +
+    [Tooltip("The id of the scene in terms of desired game progression. 0 is default and reserved for main menu," +
+             " 1 for first level, etc. Negative values can be implemented for special scenes/levels.")]
+    [SerializeField] private int chronologicalId = -1;
+    
+    [Tooltip("The name of the scene. If left empty, the chronologicalId will be used as the name." +
              " This is for display purposes and does not affect loading.")]
     [SerializeField] private string nameId;
-    
-    [SerializeField] 
     
     #if UNITY_EDITOR
     public SceneAsset SceneAsset
@@ -111,9 +113,24 @@ public class SceneSettingsSO : ScriptableObject
 
     #endregion
     
-    public int Id => id;
+    /// <summary>
+    /// The constant id of the scene, which should be unique from existing ConstantIds and never changed after creation.
+    /// This is for application structure purposes and does not affect loading.
+    /// </summary>
+    public int ConstantId => constantId;
     
-    public string Name => string.IsNullOrEmpty(nameId) ? $"{id}" : nameId;
+    /// <summary>
+    /// The chronological id of the scene, which should be set according to desired game progression.
+    /// 0 is default and reserved for main menu, 1 for first level, etc.
+    /// Negative values can be implemented for special scenes/levels.
+    /// </summary>
+    public int ChronologicalId => chronologicalId;
+    
+    /// <summary>
+    /// The name of the scene, which is for display purposes and does not affect loading.
+    /// If left empty, the chronologicalId will be used as the name.
+    /// </summary>
+    public string Name => string.IsNullOrEmpty(nameId) ? $"{constantId}" : nameId;
     
     
 

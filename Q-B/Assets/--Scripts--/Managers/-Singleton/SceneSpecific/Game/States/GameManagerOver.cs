@@ -17,6 +17,13 @@ public class GameManagerOver : GameManager.GameManagerState
         if (ApplicationManager.Instance != null)
         {
             ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Paused);
+            
+            if (Context.gameWon)
+            {
+                // this game levels are just pass fail, so if the player won, set the best score to 1 (pass)
+                PlayerPrefsManager.SetSceneBestScore(ApplicationManager.Instance.ActiveSceneSettings.ChronologicalId,
+                    1);
+            }
         }
         else
         {

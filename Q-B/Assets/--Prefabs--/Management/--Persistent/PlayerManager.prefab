@@ -202,11 +202,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'to begin Q-B,
+  m_text: 'first Q <b>-</b> B,
 
 
 
-    press enter / start
+    press enter or start.
 
 '
   m_isRightToLeft: 0
