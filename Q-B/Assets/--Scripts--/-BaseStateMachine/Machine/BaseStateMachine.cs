@@ -254,12 +254,6 @@ public abstract class BaseStateMachine<EState> : MonoBehaviour where EState : En
             return false;
         }
         
-        if (CurrentState.State == null)
-        {
-            // coming from nothing, allow any state to be transitioned to as current state is not set yet
-            return true;
-        }
-        
         if (CurrentState.InvalidTransitionStates.Contains(toState))
         {
             Debug.LogWarning($"Invalid state transition from {CurrentState.State} to {toState}");
@@ -269,14 +263,10 @@ public abstract class BaseStateMachine<EState> : MonoBehaviour where EState : En
         
         if (CurrentState.State.Equals(toState))
         {
-            // Debug.LogWarning($"Invalid state transition from {CurrentState.State} to {toState}");
-            
-            //Todo; comeback and remove the things double calling and causing this to happen
+            Debug.LogWarning($"Blocked duplicate transition from {CurrentState.State} to {toState}");
             
             return false;
         }
-        
-        
         
         return true;
     }

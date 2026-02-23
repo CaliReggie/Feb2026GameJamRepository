@@ -12,10 +12,28 @@ public class ApplicationManagerLoadingScene : ApplicationManager.ApplicationMana
 
     private bool _isFirstEverEnter = true;
     
+    private bool _didFirstValidUpdateOccur; // Used to track if the first valid update has occurred
+                                            // (i.e., target scene is active)
+    
     public override void EnterState()
     {
+        _didFirstValidUpdateOccur = false; // Reset the flag for the first valid update
+        
         // Pause the game while loading
         Time.timeScale = 0f; 
+        
+        // ensure covered screen
+        Context.transitionImage.transform.position = Context.coveredLocation.position;
+        
+        // if target scene settings is not null, ensure covered color if color transition
+        if (Context.targetSceneSettings != null)
+        {
+            if (Context.targetSceneSettings.transitionStyle == 
+                ApplicationManager.ApplicationManagerContext.ETransitionStyle.ColorTransition)
+            {
+                Context.transitionImage.color = Context.targetSceneSettings.CoveredColor;
+            }
+        }
         
         // if first enter ever, don't load scene if already active
         if (_isFirstEverEnter)
@@ -24,6 +42,7 @@ public class ApplicationManagerLoadingScene : ApplicationManager.ApplicationMana
             
             if (SceneSettingsSO.IsActiveScene(Context.targetSceneSettings))
             {
+                
                 return;
             }
         }
@@ -35,7 +54,7 @@ public class ApplicationManagerLoadingScene : ApplicationManager.ApplicationMana
     public override void UpdateState()
     {
         // If target scene is indeed active
-        if (SceneSettingsSO.IsActiveScene(Context.targetSceneSettings)) 
+        if (!_didFirstValidUpdateOccur && SceneSettingsSO.IsActiveScene(Context.targetSceneSettings)) 
         {
             //Ensure the active scene SO is set correctly
             Context.SetActiveSceneSO(Context.targetSceneSettings);
@@ -44,8 +63,9 @@ public class ApplicationManagerLoadingScene : ApplicationManager.ApplicationMana
             // do so and keep things clean)
             Context.targetSceneSettings = null;
             
-            // Change to running state will exit this update loop
-            Context.ContextCallChangeState(ApplicationManager.EApplicationState.Running);
+            _didFirstValidUpdateOccur = true; // Set the flag to indicate the first valid update has occurred
+
+            Context.StartTransitionInScene();
         }
     }
     

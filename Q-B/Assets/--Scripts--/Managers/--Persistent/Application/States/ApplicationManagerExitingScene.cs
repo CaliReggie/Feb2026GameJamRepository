@@ -13,19 +13,35 @@ public class ApplicationManagerExitingScene : ApplicationManager.ApplicationMana
     {
         // Pause the game while exiting
         Time.timeScale = 0f; 
+        
+        
+        if (Context.activeSceneSettings != null) // if active scene settings is not null, ensure proper transition
+        // settings
+        {
+            // if location transition
+            if (Context.activeSceneSettings.transitionStyle ==
+                ApplicationManager.ApplicationManagerContext.ETransitionStyle.LocationTransition)
+            {
+                Context.transitionImage.transform.position =
+                    Context.uncoveredLocation.position; // uncover screen
+            }
+            else
+            {
+                // cover screen
+                Context.transitionImage.transform.position =
+                    Context.coveredLocation.position; 
+
+                // ensure uncovered color
+                Context.transitionImage.color = Context.activeSceneSettings.UncoveredColor;
+            }
+        }
+
+        Context.StartTransitionOutScene();
     }
     
     public override void UpdateState()
     {
-        // If mainUIManager exists
-        if (MainUiManager.Instance != null)
-        {
-            // don't load the scene till the transition out is complete
-            if (MainUiManager.Instance.CurrentState.State == MainUiManager.EMainUIState.TransitionOutScene) return;
-        }
         
-        // change to loading will exit this update loop
-        Context.ContextCallChangeState(ApplicationManager.EApplicationState.LoadingScene);
     }
     public override void ExitState()
     {

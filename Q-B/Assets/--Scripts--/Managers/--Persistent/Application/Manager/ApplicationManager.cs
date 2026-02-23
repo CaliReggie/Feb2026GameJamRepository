@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 /// <summary>
 /// ApplicationManager class extends BaseStateManager and exists as a persistent singleton. It manages the highest
@@ -35,13 +36,6 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
     /// The currently active scene settings SO being managed by the ApplicationManager.
     /// </summary>
     public SceneSettingsSO ActiveSceneSettings => context.activeSceneSettings; 
-    
-    // Todo: needed one day? possible mismatch with changes to player state logic? see players setting for toggle? V
-    // /// <summary>
-    // /// Get and Set property to stop scene from being able to toggle between running and paused states.
-    // /// Should be managed EXTREMELY SPECIFICALLY, typically by a singular scene or game manager.
-    // /// </summary>
-    // public bool IgnoreRunningAndAlternateRunningToggle { get; set;}
 
     #region BaseMethods
     
@@ -58,7 +52,8 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
     
     private IEnumerator DelayedStart()
     {
-        yield return null; // Wait one frame to ensure all Awake/enable calls are done (possible issue in future?)
+        // Wait one frame to ensure all Awake/enable calls are done (possible issue in future?)
+        yield return null; 
 
         base.Start();
     }
@@ -135,12 +130,103 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
         
         ChangeState(EApplicationState.Closing);
     }
+    
+    /// <summary>
+    /// On top of base, managing the transition effects during loading and exiting scenes.
+    /// </summary>
+    protected override void Update()
+    {
+        base.Update();
+        
+        if (!Started || IsChangingState) return;
+        
+        if (context.currentTransitionTimeLeft > 0f)
+        {
+            switch (CurrentState.State)
+            {
+                case EApplicationState.LoadingScene:
+                    
+                    float loadingTransitionTimeLeft = context.currentTransitionTimeLeft;
+                    
+                    float loadingTransitionPercentageLeft = loadingTransitionTimeLeft / context.activeSceneSettings.TransitionInDuration;
+                    
+                    float loadingI = 1 - context.activeSceneSettings.TransitionInCurve.Evaluate(loadingTransitionPercentageLeft);
+                    
+                    if (context.activeSceneSettings.transitionStyle ==
+                        ApplicationManagerContext.ETransitionStyle.LocationTransition)
+                    {
+                        context.transitionImage.transform.position =
+                            Vector3.Lerp(context.coveredLocation.position,
+                                context.uncoveredLocation.position, loadingI);
+                    }
+                    else
+                    {
+                        context.transitionImage.color = Color.Lerp(context.activeSceneSettings.coveredColor,
+                            context.activeSceneSettings.uncoveredColor, loadingI);
+                    }
+                    
+                    context.currentTransitionTimeLeft -= Time.unscaledDeltaTime;
+                    
+                    if (context.currentTransitionTimeLeft <= 0f)
+                    {
+                        context.transitionImage.transform.position = context.uncoveredLocation.position;
+                        
+                        context.ContextCallChangeState(EApplicationState.Running);
+                    }
+                    
+                    break;
+                
+                case EApplicationState.ExitingScene:
+                    
+                    float exitingTransitionTimeLeft = context.currentTransitionTimeLeft;
+                    
+                    float exitingTransitionPercentageLeft = exitingTransitionTimeLeft / context.activeSceneSettings.TransitionOutDuration;
+                    
+                    float exitingI = 1 - context.activeSceneSettings.TransitionOutCurve.Evaluate(exitingTransitionPercentageLeft);
+                    
+                    if (context.activeSceneSettings.transitionStyle ==
+                        ApplicationManagerContext.ETransitionStyle.LocationTransition)
+                    {
+                        context.transitionImage.transform.position =
+                            Vector3.Lerp(context.uncoveredLocation.position,
+                                context.coveredLocation.position, exitingI);
+                    }
+                    else
+                    {
+                        context.transitionImage.color = Color.Lerp(context.activeSceneSettings.uncoveredColor,
+                            context.activeSceneSettings.coveredColor, exitingI);
+                    }
+                    
+                    context.currentTransitionTimeLeft -= Time.unscaledDeltaTime;
+                    
+                    if (context.currentTransitionTimeLeft <= 0f)
+                    {
+                        context.transitionImage.transform.position = context.coveredLocation.position;
+                        
+                        context.ContextCallChangeState(EApplicationState.LoadingScene);
+                    }
+                    
+                    break;
+            }
+        }
+    }
 
     #endregion
-    
+
     [Serializable] 
     public class ApplicationManagerContext : BaseStateMachineContext
     {
+        /// <summary>
+        /// The style of transition to use for scene transitions.
+        /// </summary>
+        public enum ETransitionStyle
+        {
+            [Tooltip("Transition by moving an image covering the screen.")]
+            LocationTransition,
+            [Tooltip("Transition by changing the color/opacity of an image covering the screen.")]
+            ColorTransition,
+        }
+        
         #region Context Declarations
         
         [Header("Inscribed References")]
@@ -149,6 +235,15 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
                  "SET IN INSPECTOR as the corresponding sceneSO that this manager is starting in.")]
         public SceneSettingsSO targetSceneSettings;
         
+        [Tooltip("The image used to cover/uncover the screen during transitions.")]
+        public Image transitionImage;
+        
+        [Tooltip("The location where the transition image fully covers the screen.")]
+        public Transform coveredLocation;
+        
+        [Tooltip("The location where the transition image is fully off the screen.")]
+        public Transform uncoveredLocation;
+        
         [Header("Dynamic References - Don't Modify in Inspector")]
             
         [Tooltip("Reference to the ApplicationManager that owns this context.")]
@@ -156,6 +251,11 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
         
         [Tooltip("SceneSO currently being managed by the AppManager, set by self on init or when loading new scene.")]
         public SceneSettingsSO activeSceneSettings;
+        
+        [Header("Dynamic Settings - Don't Modify in Inspector")]
+        
+        [Tooltip("The current time left in the scene transition. Set by self when transitioning scenes.")]
+        public float currentTransitionTimeLeft;
         
         #endregion
         
@@ -212,7 +312,11 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
             
             // check inscribed references
             if (targetSceneSettings == null ||
-                !SceneSettingsSO.IsValidScene(targetSceneSettings))
+                !SceneSettingsSO.IsValidScene(targetSceneSettings) ||
+                transitionImage == null ||
+                coveredLocation == null ||
+                uncoveredLocation == null
+                )
             {
                 Debug.LogError($"{GetType().Name}: Error Checking Inscribed References. Destroying self.");
                 
@@ -220,6 +324,8 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
                 
                 return null;
             }
+            
+            currentTransitionTimeLeft = 0f;
 
             return InitializedStates();
         }
@@ -296,6 +402,18 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
             
             // change to exiting scene state
             ContextCallChangeState(EApplicationState.ExitingScene);
+        }
+        
+        public void StartTransitionInScene()
+        {
+            currentTransitionTimeLeft = 
+                activeSceneSettings != null ? activeSceneSettings.TransitionInDuration : 0f;
+        }
+        
+        public void StartTransitionOutScene()
+        {
+            currentTransitionTimeLeft = 
+                activeSceneSettings != null ? activeSceneSettings.TransitionOutDuration : 0f;
         }
 
         #endregion
