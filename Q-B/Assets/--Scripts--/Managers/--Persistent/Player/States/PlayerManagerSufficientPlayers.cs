@@ -41,7 +41,7 @@ public class PlayerManagerSufficientPlayers : PlayerManager.InputManagerState
         
         // cursor confined and invisible since managed by player cursor components
         Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Cursor.visible = false;
     }
 
     public override void UpdateState()

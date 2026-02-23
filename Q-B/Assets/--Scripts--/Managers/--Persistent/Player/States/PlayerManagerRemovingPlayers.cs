@@ -35,9 +35,8 @@ public class PlayerManagerRemovingPlayers : PlayerManager.InputManagerState
             Context.RemovePlayer(Context.NumPlayers); 
         }
         
-        // cursor unlocked and visible in case something goes wrong and players need to cancel/quit
+        // cursor unlocked in case something goes wrong and players need to cancel/quit
         Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
     }
 
     public override void UpdateState()
