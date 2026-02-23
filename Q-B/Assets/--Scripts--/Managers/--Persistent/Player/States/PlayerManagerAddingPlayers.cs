@@ -33,12 +33,12 @@ public class PlayerManagerAddingPlayers : PlayerManager.InputManagerState
             Time.timeScale = 0f;
         }
         
-        // toggling adding players page
-        Context.ToggleAddingPlayersPage(true, PlayersNeeded);
-        
         // cursor unlocked and visible in case players can't add and need to cancel/quit
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        
+        // toggling adding players page
+        Context.ToggleAddingPlayersPage(true, PlayersNeeded);
     }
 
     public override void UpdateState()

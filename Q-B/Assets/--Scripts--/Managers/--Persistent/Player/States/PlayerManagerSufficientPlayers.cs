@@ -14,7 +14,7 @@ public class PlayerManagerSufficientPlayers : PlayerManager.InputManagerState
     {
         Context.inputManagerComponent.DisableJoining(); // Disable player joining input
         
-        // determining target player state V
+        // determining target player settings state to set V
         
         // if setup application manager
         if (Context.playerManager.IsApplicationManager && ApplicationManager.Instance.Started)

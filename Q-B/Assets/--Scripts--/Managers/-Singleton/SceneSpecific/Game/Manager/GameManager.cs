@@ -164,6 +164,8 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         {
             case PlayerManager.EPlayerManagementState.SufficientPlayers:
                 
+                // if just got sufficient players and application manager
+                // exists and is in running state, go to Playing state
                 if (ApplicationManager.Instance != null &&
                     ApplicationManager.Instance.CurrentState.State == ApplicationManager.EApplicationState.Running)
                 {
@@ -171,10 +173,10 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
                 }
                 
                 break;
-            
             case PlayerManager.EPlayerManagementState.AddingPlayers:
             case PlayerManager.EPlayerManagementState.RemovingPlayers:
                 
+                // if not at sufficient players anymore, reset with initialize and wait for sufficient players again
                 context.ContextCallChangeState(EGameState.Initialize);
                 
                 break;

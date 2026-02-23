@@ -73,6 +73,40 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
     #region PublicMethods
     
     /// <summary>
+    /// Public method to request change game state. Internal denials can happen.
+    /// </summary>
+    public void RequestChangeState(EApplicationState toState)
+    {
+        ChangeState(toState);
+    }
+    
+    /// <summary>
+    /// Call to toggle between running and alternate running states. IE: Playing v Paused in game.
+    /// (Currently, there is only one alternate state, more states could be added, logic would have to be modified).
+    /// </summary>
+    public void ToggleRunningOrPausedState()
+    {
+        // determine current state
+        EApplicationState currentState = CurrentState.State;
+        
+        // running => paused
+        if (currentState == EApplicationState.Running)
+        {
+            ChangeState(EApplicationState.Paused);
+        }
+        // paused => running
+        else if (currentState == EApplicationState.Paused)
+        {
+            ChangeState(EApplicationState.Running);
+        }
+        // otherwise can't
+        else
+        {
+            Debug.LogWarning($"Cannot toggle running state from current state: {currentState}");
+        }
+    }
+    
+    /// <summary>
     /// Takes in a Scene SO and attempts to begin exiting the current scene and loading it if valid.
     /// </summary>
     public void TryLoadScene(SceneSettingsSO targetSceneSettingsSo)
@@ -101,42 +135,8 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
         
         ChangeState(EApplicationState.Closing);
     }
-    
-    /// <summary>
-    /// Call to toggle between running and alternate running states. IE: Playing v Paused in game.
-    /// (Currently, there is only one alternate state, more states could be added, logic would have to be modified).
-    /// </summary>
-    public void ToggleRunningOrPausedState()
-    {
-        // determine current state
-        EApplicationState currentState = CurrentState.State;
-        
-        // running => paused
-        if (currentState == EApplicationState.Running)
-        {
-            ChangeState(EApplicationState.Paused);
-        }
-        // paused => running
-        else if (currentState == EApplicationState.Paused)
-        {
-            ChangeState(EApplicationState.Running);
-        }
-        // otherwise can't
-        else
-        {
-            Debug.LogWarning($"Cannot toggle running state from current state: {currentState}");
-        }
-    }
 
     #endregion
-    
-    /// <summary>
-    /// Public method to request change game state. Internal denials can happen.
-    /// </summary>
-    public void RequestChangeState(EApplicationState toState)
-    {
-        ChangeState(toState);
-    }
     
     [Serializable] 
     public class ApplicationManagerContext : BaseStateMachineContext

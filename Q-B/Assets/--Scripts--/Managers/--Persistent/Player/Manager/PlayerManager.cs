@@ -66,7 +66,7 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
                 if (ApplicationManager.Instance.CurrentState.State ==
                     ApplicationManager.EApplicationState.LoadingScene)
                 {
-                    // if coming from loading scene, set players settings from active scene settings SO
+                    // if going from loading scene, set players settings from active scene settings SO
                     context.SetPlayersSettings(ApplicationManager.Instance.ActiveSceneSettings.PlayerManagerSettings);
                 }
                 
@@ -86,20 +86,20 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
         {
             case ApplicationManager.EApplicationState.Running:
                 
-                // if sufficient players can target player settings to default
+                // if sufficient players can set target player settings to default
                 if (CurrentState.State == EPlayerManagementState.SufficientPlayers)
                 {
-                    // we set from default settings since from running
+                    // we set to default settings since from running
                     context.ChangeTargetPlayerSettingsConfigurationType(PlayerSettingsSO.EPlayerConfigurationType.Default);
                 }
                 
                 break;
             case ApplicationManager.EApplicationState.Paused:
                 
-                // if sufficient players can target player settings to alternate
+                // if sufficient players can set target player settings to alternate
                 if (CurrentState.State == EPlayerManagementState.SufficientPlayers)
                 {
-                    // we set from alternate settings since from alternate running
+                    // we set to alternate settings since from alternate running
                     context.ChangeTargetPlayerSettingsConfigurationType(PlayerSettingsSO.EPlayerConfigurationType.Alternate);
                 }
                 
@@ -109,11 +109,11 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
     
     protected override void OnDestroy()
     {
+        // reset settings state when closing / quitting
         if (CurrentPlayerManagerSettings != null)
         {
             CurrentPlayerManagerSettings.TargetPlayerConfigurationType = PlayerSettingsSO.EPlayerConfigurationType.Off;
         }
-        
         
         base.OnDestroy();
     }

@@ -98,6 +98,7 @@ public class PlayerInputObject : BaseStateMachine<PlayerInputObject.EPlayerInput
             PlayerManager.Instance.OnAfterPlayerManagerSettingsChanged -= context.OnAfterPlayerManagerSettingsChanged;
         }
         
+        // reset settings state when closing or quitting
         if (CurrentPlayerSettings != null)
         {
             CurrentPlayerSettings.CurrentConfigurationType = PlayerSettingsSO.EPlayerConfigurationType.Off;
@@ -195,8 +196,6 @@ public class PlayerInputObject : BaseStateMachine<PlayerInputObject.EPlayerInput
         }
         
         // if managed by PlayerManager, notify of desired change so it can manage accordingly
-        // (this currently can cause double calls which result in warnings, but is not (currently, XD)
-        // recursive or detrimental)
         if (IsPlayerManager)
         {
             PlayerManager.Instance.OnPlayerChangePlayerSettingsConfigurationType(this, targetConfigurationType);
