@@ -41,19 +41,12 @@ public class GameManagerInitialize : GameManager.GameManagerState
 
     public override void UpdateState()
     {
-        // wait for sufficient players to start playing
-        if (PlayerManager.Instance != null &&
-            PlayerManager.Instance.CurrentState.State == PlayerManager.EPlayerManagementState.SufficientPlayers)
-        {
-            Context.ContextCallChangeState(GameManager.EGameState.Playing);
-        }
-        // if no player manager, just start playing
-        else if (PlayerManager.Instance == null &&
+        // if no player manager, start playing if found a player in scene
+        if (PlayerManager.Instance == null &&
                  Context.singlePlayerPioReference != null)
         {
             Context.ContextCallChangeState(GameManager.EGameState.Playing);
         }
-
     }
 
     public override void ExitState()

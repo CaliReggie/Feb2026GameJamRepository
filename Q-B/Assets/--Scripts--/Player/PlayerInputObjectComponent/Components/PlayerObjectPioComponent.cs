@@ -137,7 +137,7 @@ public class PlayerObjectPioComponent : PioComponent
     /// <summary>
     /// Teleports the player object to the target location. Optionally also rotates to match target Euler rotation.
     /// </summary>
-    public void TpPlayerObject(Vector3 targetPosition, Vector3 targetEulerRotation, bool alsoRotate)
+    public void TpPlayerObject(Vector3 targetPosition, Vector3 targetEulerRotation, bool alsoRotate, bool alsoResetDynamicSettings = false)
     {
         // if the character controller is enabled and active we have to use its move method
         if (playerObject.gameObject.activeSelf)
@@ -150,6 +150,11 @@ public class PlayerObjectPioComponent : PioComponent
             playerObject.position = targetPosition;
             
             playerObject.SetPositionAndRotation(targetPosition, alsoRotate ? Quaternion.Euler(targetEulerRotation) : playerObject.rotation);
+        }
+        
+        if (alsoResetDynamicSettings)
+        {
+            ResetDynamicSettings();
         }
     }
     
@@ -229,6 +234,11 @@ public class PlayerObjectPioComponent : PioComponent
                 {
                     DeSpawn();
                     
+                    if (GameManager.Instance != null)
+                    {
+                        GameManager.Instance.OnAfterStateChange -= OnAfterGameManagerStateChange;
+                    }
+                    
                     enabled = false;
                 }
                 
@@ -249,6 +259,20 @@ public class PlayerObjectPioComponent : PioComponent
                 if (!enabled)
                 {
                     Spawn();
+                    
+                    if (GameManager.Instance != null)
+                    {
+                        GameManager.Instance.OnAfterStateChange += OnAfterGameManagerStateChange;
+                        
+                        if (GameManager.Instance.Started)
+                        {
+                            OnAfterGameManagerStateChange(GameManager.Instance.CurrentState.State);
+                        }
+                        else
+                        {
+                            OnAfterGameManagerStateChange(GameManager.EGameState.Initialize);
+                        }
+                    }
 
                     enabled = true;
                 }
@@ -260,6 +284,25 @@ public class PlayerObjectPioComponent : PioComponent
     protected override void OnAfterPioSettingsChange(PlayerSettingsSO playerSettings)
     {
         // can add the spawn point logic here if desired or required
+    }
+    
+    private void OnAfterGameManagerStateChange(GameManager.EGameState toState)
+    {
+        switch (toState)
+        {
+            case GameManager.EGameState.Initialize:
+                playerObjectRigidbody.isKinematic = true;
+                break;
+        }
+        
+        if (GameManager.Instance.PreviousState != null)
+        {
+            if (GameManager.Instance.PreviousState.State == GameManager.EGameState.Initialize &&
+                toState == GameManager.EGameState.Playing)
+            {
+                playerObjectRigidbody.isKinematic = false;
+            }
+        }
     }
 
     /// <summary>
@@ -308,9 +351,7 @@ public class PlayerObjectPioComponent : PioComponent
         }
         
         // teleport to spawn point
-        TpPlayerObject(targetSpawnPosition, targetSpawnEulerRotation, true);
-        
-        ResetDynamicSettings();
+        TpPlayerObject(targetSpawnPosition, targetSpawnEulerRotation, true, true);
         
         // turn on player object
         playerObject.gameObject.SetActive(true);
@@ -322,9 +363,7 @@ public class PlayerObjectPioComponent : PioComponent
     private void DeSpawn()
     {
         // teleport to spawn point
-        TpPlayerObject(targetSpawnPosition, targetSpawnEulerRotation, true);
-        
-        ResetDynamicSettings();
+        TpPlayerObject(targetSpawnPosition, targetSpawnEulerRotation, true, true);
         
         // turn off player object
         playerObject.gameObject.SetActive(false);
@@ -332,22 +371,33 @@ public class PlayerObjectPioComponent : PioComponent
     
     /// <summary>
     /// Used to reset all dynamic settings related to movement and state of the player object and go back to idle.
-    /// DOES NOT reset spawn position/rotation.
+    /// DOES NOT reset object spawn position/rotation.
     /// </summary>
     private void ResetDynamicSettings()
     {
-        // arms should always start in the same position relative to the body on spawn
-        TargetCursorHitWorldPosition = CurrentObjectPosition;
-        
-        // joint needs to be reset
+        // joint settings need to be reset
+        TargetCursorHitWorldPosition = CurrentObjectPosition; // arms tucked to body
         playerArmsJoint.targetPosition = Vector3.zero;
         playerArmsJoint.targetRotation = Quaternion.identity;
-        playerArmsJoint.transform.localPosition = Vector3.zero;
-        playerArmsJoint.transform.localRotation = Quaternion.identity;
+
+        // // arm rigidbody should be reset
+        // (this does get position/rotation reset because it is a free child of player object)
         
-        // rigidbody velocity should be reset
-        playerObjectRigidbody.linearVelocity = Vector3.zero;
-        playerObjectRigidbody.angularVelocity = Vector3.zero;
+        playerArmsRigidbody.transform.localPosition = Vector3.zero;
+        playerArmsRigidbody.transform.localRotation = Quaternion.identity;
+        if (!playerArmsRigidbody.isKinematic)
+        {
+            playerArmsRigidbody.linearVelocity = Vector3.zero;
+            playerArmsRigidbody.angularVelocity = Vector3.zero;
+        }
+        
+        
+        // object rigidbody should be reset
+        if (!playerObjectRigidbody.isKinematic)
+        {
+            playerObjectRigidbody.linearVelocity = Vector3.zero;
+            playerObjectRigidbody.angularVelocity = Vector3.zero;
+        }
         
         extendArmsPressed = false;
         wasExtendArmsPressed = false;

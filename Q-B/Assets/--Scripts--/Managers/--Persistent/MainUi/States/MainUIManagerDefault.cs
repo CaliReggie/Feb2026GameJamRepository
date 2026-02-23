@@ -16,7 +16,7 @@ public class MainUIManagerDefault : MainUiManager.MainUIManagerState
         if (Context.mainUIManager.IsApplicationManager) 
         {
             //If application initialized and Running or Paused
-            if (ApplicationManager.Instance.CurrentState != null && (
+            if (ApplicationManager.Instance.Started && (
                 ApplicationManager.Instance.CurrentState.State == ApplicationManager.EApplicationState.Running ||
                 ApplicationManager.Instance.CurrentState.State == ApplicationManager.EApplicationState.Paused))
             {

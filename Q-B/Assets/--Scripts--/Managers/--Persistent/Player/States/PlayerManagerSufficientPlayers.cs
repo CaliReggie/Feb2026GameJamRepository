@@ -1,4 +1,6 @@
 
+using UnityEngine;
+
 public class PlayerManagerSufficientPlayers : PlayerManager.InputManagerState
 {
     public PlayerManagerSufficientPlayers(PlayerManager.PlayerManagerContext context,
@@ -15,7 +17,7 @@ public class PlayerManagerSufficientPlayers : PlayerManager.InputManagerState
         // determining target player state V
         
         // if setup application manager
-        if (Context.playerManager.IsApplicationManager && ApplicationManager.Instance.CurrentState != null)
+        if (Context.playerManager.IsApplicationManager && ApplicationManager.Instance.Started)
         {
             // depends on application state
             switch (ApplicationManager.Instance.CurrentState.State)
@@ -36,7 +38,11 @@ public class PlayerManagerSufficientPlayers : PlayerManager.InputManagerState
         {
             Context.ChangeTargetPlayerSettingsConfigurationType(PlayerSettingsSO.EPlayerConfigurationType.Default);
         }
-}
+        
+        // cursor confined and invisible since managed by player cursor components
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
 
     public override void UpdateState()
     {
@@ -61,5 +67,14 @@ public class PlayerManagerSufficientPlayers : PlayerManager.InputManagerState
 
     public override void ExitState()
     {
+        // resume application time
+        if (ApplicationManager.Instance != null)
+        {
+            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Running);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
     }
 }

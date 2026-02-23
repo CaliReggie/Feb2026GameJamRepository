@@ -38,7 +38,7 @@ public class DynamicRigidbodyGameListener : GameManagerListener
         switch (toState)
         {
             case GameManager.EGameState.Initialize:
-                ResetRb();
+                SetRbKinematic();
                 break;
         }
         
@@ -52,13 +52,15 @@ public class DynamicRigidbodyGameListener : GameManagerListener
         }
     }
 
-    private void ResetRb()
+    private void SetRbKinematic()
     {
         if (initiallyKinematic) {return;}
         
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        rb.isKinematic = true;
+        if (!rb.isKinematic)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
         
         if (gameObject.activeInHierarchy)
         {
@@ -69,6 +71,8 @@ public class DynamicRigidbodyGameListener : GameManagerListener
             transform.position = initialPosition;
             transform.rotation = initialRotation;
         }
+        
+        rb.isKinematic = true;
     }
     
     private void SetRbDynamic()

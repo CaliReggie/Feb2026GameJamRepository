@@ -97,6 +97,11 @@ public class PlayerInputObject : BaseStateMachine<PlayerInputObject.EPlayerInput
         {
             PlayerManager.Instance.OnAfterPlayerManagerSettingsChanged -= context.OnAfterPlayerManagerSettingsChanged;
         }
+        
+        if (CurrentPlayerSettings != null)
+        {
+            CurrentPlayerSettings.CurrentConfigurationType = PlayerSettingsSO.EPlayerConfigurationType.Off;
+        }
     }
 
     /// <summary>
@@ -155,12 +160,11 @@ public class PlayerInputObject : BaseStateMachine<PlayerInputObject.EPlayerInput
         // If PlayerSettingsSO does not allow manual switching, cannot toggle
         if (!CurrentPlayerSettings.AllowManualSwitching) { return; }
         
-        // cannot toggle out of game over state
-        // todo: added specifically for game manager over state... better way?
+        // cannot toggle during certain game manager states
         if (GameManager.Instance != null &&
-            GameManager.Instance.CurrentState.State == GameManager.EGameState.GameOver)
+            GameManager.Instance.CurrentState.State != GameManager.EGameState.Playing &&
+             GameManager.Instance.CurrentState.State != GameManager.EGameState.Paused)
         {
-            
             return;
         }
         
@@ -190,10 +194,7 @@ public class PlayerInputObject : BaseStateMachine<PlayerInputObject.EPlayerInput
             
         }
         
-        // calling the method in context
-        context.ChangePlayerSettingsConfigurationType(targetConfigurationType);
-        
-        // if managed by PlayerManager, notify of change so it can manage accordingly
+        // if managed by PlayerManager, notify of desired change so it can manage accordingly
         // (this currently can cause double calls which result in warnings, but is not (currently, XD)
         // recursive or detrimental)
         if (IsPlayerManager)
@@ -202,16 +203,19 @@ public class PlayerInputObject : BaseStateMachine<PlayerInputObject.EPlayerInput
         }
         else
         {
+            // manually calling state change in context
+            context.ChangePlayerSettingsConfigurationType(targetConfigurationType);
+            
             // added for manual designer testing without full PlayerManager/ApplicationManager setup
             if (GameManager.Instance != null)
             {
                 switch(targetConfigurationType)
                 {
                     case PlayerSettingsSO.EPlayerConfigurationType.Default:
-                        GameManager.Instance.ManualChangeState(GameManager.EGameState.Playing);
+                        GameManager.Instance.Play();
                         break;
                     case PlayerSettingsSO.EPlayerConfigurationType.Alternate:
-                        GameManager.Instance.ManualChangeState(GameManager.EGameState.Paused);
+                        GameManager.Instance.Pause();
                         break;
                 }
             }
@@ -515,13 +519,17 @@ public class PlayerInputObject : BaseStateMachine<PlayerInputObject.EPlayerInput
                     {
                         ChangePlayerSettingsConfigurationType(targetConfigurationType);
                     }
-                    // if not forced but currently off, and target not off, change to target
+                    // if not forced, but currently own type is off and target is not off, change to target
+                    // (this IS following player manager, but only in cases where the player manager is trying to
+                    // turn on or off players, not trying to change between alternate and default or anything like that,
+                    // which is more of a player choice if not following the manager)
                     else if (currentPlayerSettings.CurrentConfigurationType == PlayerSettingsSO.EPlayerConfigurationType.Off && 
                              targetConfigurationType != PlayerSettingsSO.EPlayerConfigurationType.Off)
                     {
                         ChangePlayerSettingsConfigurationType(targetConfigurationType);
                     }
-                    // els if not forced but currently not off, and target is off, change to target
+                    // else if not forced but currently not off, and target is off, change to target
+                    // (same as above)
                     else if (currentPlayerSettings.CurrentConfigurationType != PlayerSettingsSO.EPlayerConfigurationType.Off && 
                              targetConfigurationType == PlayerSettingsSO.EPlayerConfigurationType.Off)
                     {

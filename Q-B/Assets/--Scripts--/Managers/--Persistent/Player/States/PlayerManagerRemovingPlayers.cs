@@ -1,4 +1,6 @@
 
+using UnityEngine;
+
 public class PlayerManagerRemovingPlayers : PlayerManager.InputManagerState
 {
     public PlayerManagerRemovingPlayers(PlayerManager.PlayerManagerContext context,
@@ -16,11 +18,26 @@ public class PlayerManagerRemovingPlayers : PlayerManager.InputManagerState
         // // setting target state to off while managing player count
         Context.ChangeTargetPlayerSettingsConfigurationType(PlayerSettingsSO.EPlayerConfigurationType.Off);
         
+        // Pause the application time
+        if (ApplicationManager.Instance != null &&
+            ApplicationManager.Instance.Started)
+        {
+            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Paused);
+        }
+        else
+        {
+            Time.timeScale = 0f;
+        }
+        
         // Remove players until the number of players matches the target
         while (Context.NumPlayers > Context.TargetPlayers)  // CHEEKY WHILE LOOP ??!! :D (could it break?)
         {
             Context.RemovePlayer(Context.NumPlayers); 
         }
+        
+        // cursor unlocked and visible in case something goes wrong and players need to cancel/quit
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public override void UpdateState()
@@ -37,5 +54,15 @@ public class PlayerManagerRemovingPlayers : PlayerManager.InputManagerState
 
     public override void ExitState()
     {
+        // resume application time
+        if (ApplicationManager.Instance != null&&
+            ApplicationManager.Instance.Started)
+        {
+            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Running);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
     }
 }

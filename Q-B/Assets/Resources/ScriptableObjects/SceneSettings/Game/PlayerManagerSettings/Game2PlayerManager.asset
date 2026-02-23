@@ -19,4 +19,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9950772128bb65741a57ff6be423e80f, type: 2}
   allNeededToPauseTime: 1
   forceConfigurationTypeMatch: 1
-  targetPlayerConfigurationType: 1
+  targetPlayerConfigurationType: 0

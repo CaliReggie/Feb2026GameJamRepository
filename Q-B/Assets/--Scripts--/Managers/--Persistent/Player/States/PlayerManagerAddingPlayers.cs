@@ -1,3 +1,5 @@
+using UnityEngine;
+
 
 public class PlayerManagerAddingPlayers : PlayerManager.InputManagerState
 {
@@ -20,8 +22,23 @@ public class PlayerManagerAddingPlayers : PlayerManager.InputManagerState
         // setting target state to off while managing player count
         Context.ChangeTargetPlayerSettingsConfigurationType(PlayerSettingsSO.EPlayerConfigurationType.Off);
         
+        // Pause the application time
+        if (ApplicationManager.Instance != null&&
+            ApplicationManager.Instance.Started)
+        {
+            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Paused);
+        }
+        else
+        {
+            Time.timeScale = 0f;
+        }
+        
         // toggling adding players page
         Context.ToggleAddingPlayersPage(true, PlayersNeeded);
+        
+        // cursor unlocked and visible in case players can't add and need to cancel/quit
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public override void UpdateState()
@@ -48,5 +65,16 @@ public class PlayerManagerAddingPlayers : PlayerManager.InputManagerState
     {
         // toggling adding players page off
         Context.ToggleAddingPlayersPage(false);
+        
+        // resume application time
+        if (ApplicationManager.Instance != null&&
+            ApplicationManager.Instance.Started)
+        {
+            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Running);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
     }
 }

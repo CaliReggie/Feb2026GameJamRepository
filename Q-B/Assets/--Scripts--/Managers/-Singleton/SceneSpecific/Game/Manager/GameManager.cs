@@ -30,16 +30,23 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         context.ToggleWinCountdown(shouldBeCounting);
     }
     
-    /// <summary>
-    /// Called to end the game and transition to GameOver state.
-    /// </summary>
+    public void Play()
+    {
+        context.ContextCallChangeState(EGameState.Playing);
+    }
+    
+    public void Pause()
+    {
+        context.ContextCallChangeState(EGameState.Paused);
+    }
+    
     public void GameOver(bool gameWon)
     {
         context.gameWon = gameWon;
         
         context.ContextCallChangeState(EGameState.GameOver);
     }
-
+    
     
     [SerializeField] private GameManagerContext context;
     
@@ -53,6 +60,45 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
     protected override void Initialize()
     {
         States = context.ContextInitialize(this);
+    }
+    
+    protected override void Start()
+    {
+        base.Start();
+        
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.OnBeforeStateChange += OnBeforePlayerManagerStateChange;
+            
+            PlayerManager.Instance.OnAfterStateChange += OnAfterPlayerManagerStateChange;
+            
+            if (DebugMode)
+            {
+                Debug.Log($"{GetType().Name}: Subscribed to PlayerManager events.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"{GetType().Name}: No PlayerManager instance found in scene. " +
+                             $"Functionality will be limited without.");
+        }
+    }
+    
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.OnBeforeStateChange -= OnBeforePlayerManagerStateChange;
+            
+            PlayerManager.Instance.OnAfterStateChange -= OnAfterPlayerManagerStateChange;
+            
+            if (DebugMode)
+            {
+                Debug.Log($"{GetType().Name}: Unsubscribed from PlayerManager events.");
+            }
+        }
     }
     
     protected override void OnBeforeApplicationStateChange(ApplicationManager.EApplicationState toState)
@@ -89,23 +135,53 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
                 if (PlayerManager.Instance != null &&
                     PlayerManager.Instance.CurrentState.State == PlayerManager.EPlayerManagementState.SufficientPlayers)
                 {
-                    context.ContextCallChangeState(EGameState.Paused);
+                    if (CurrentState.State == EGameState.Playing)
+                    {
+                        context.ContextCallChangeState(EGameState.Paused);
+                    }
                 }
                 
                 break;
         }
     }
     
-    #endregion
-    
-    /// <summary>
-    /// Used for manual changes when application manager is not present. Implemented for designer testing without
-    /// full application manager setup.
-    /// </summary>
-    public void ManualChangeState(EGameState newState)
+    protected virtual void OnBeforePlayerManagerStateChange(PlayerManager.EPlayerManagementState fromState)
     {
-        context.ContextCallChangeState(newState);
+        if (DebugMode)
+        {
+            Debug.Log($"[{GetType().Name}] OnBeforePlayerManagerStateChange: {fromState}");
+        }
     }
+    
+    protected virtual void OnAfterPlayerManagerStateChange(PlayerManager.EPlayerManagementState toState)
+    {
+        if (DebugMode)
+        {
+            Debug.Log($"[{GetType().Name}] OnAfterPlayerManagerStateChange: {toState}");
+        }
+        
+        switch (toState)
+        {
+            case PlayerManager.EPlayerManagementState.SufficientPlayers:
+                
+                if (ApplicationManager.Instance != null &&
+                    ApplicationManager.Instance.CurrentState.State == ApplicationManager.EApplicationState.Running)
+                {
+                    context.ContextCallChangeState(EGameState.Playing);
+                }
+                
+                break;
+            
+            case PlayerManager.EPlayerManagementState.AddingPlayers:
+            case PlayerManager.EPlayerManagementState.RemovingPlayers:
+                
+                context.ContextCallChangeState(EGameState.Initialize);
+                
+                break;
+        }
+    }
+
+    #endregion
 
     [Serializable]
     public class GameManagerContext : BaseStateMachineContext

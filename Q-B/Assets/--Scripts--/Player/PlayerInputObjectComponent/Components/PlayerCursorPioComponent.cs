@@ -439,6 +439,9 @@ public class PlayerCursorPioComponent : PioComponent
                     ToggleCursorInstance(false);
                 }
                 
+                //disable hardware cursor control
+                InputSystem.onAfterUpdate -= UpdateCursor;
+                
                 break;
         }
     }
@@ -468,6 +471,9 @@ public class PlayerCursorPioComponent : PioComponent
                 
                 MoveCursorToCenter();
                 
+                //enable hardware cursor control
+                InputSystem.onAfterUpdate += UpdateCursor;
+                
                 break;
         }
         
@@ -491,22 +497,6 @@ public class PlayerCursorPioComponent : PioComponent
             Debug.LogError($"{GetType().Name}:{name}: " +
                            $"Exception updating cursor sprite on player settings change: " + e);
         }
-    }
-
-    private void OnEnable()
-    {
-        if (!Initialized) return;
-        
-        // sub to input system update
-        InputSystem.onAfterUpdate += UpdateCursor;
-    }
-
-    protected void OnDisable()
-    {
-        if (!Initialized) return;
-        
-        // unsub to input system update
-        InputSystem.onAfterUpdate -= UpdateCursor;
     }
     
     /// <summary>
@@ -666,15 +656,6 @@ public class PlayerCursorPioComponent : PioComponent
         // cannot update if not initialized or not enabled
         if (!Initialized || !enabled)
         {
-            return;
-        }
-        
-        // if cursor instance not visibly active, simply clamp cursor to center by using MoveCursorToCenter and return
-        // this is basically doing our own CursorLockMode.Locked functionality for multiplayer cursor use.
-        if (!CursorInstance.gameObject.activeInHierarchy)
-        {
-            MoveCursorToCenter();
-            
             return;
         }
         

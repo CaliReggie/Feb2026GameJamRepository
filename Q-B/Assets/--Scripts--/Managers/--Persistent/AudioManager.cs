@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -98,7 +99,10 @@ public class AudioManager : PersistentSingleton<AudioManager>
         }
         
         base.Awake();
-        
+    }
+
+    private void Start()
+    {
         ChangeMusic(EMusicType.MainMenu);
     }
 }

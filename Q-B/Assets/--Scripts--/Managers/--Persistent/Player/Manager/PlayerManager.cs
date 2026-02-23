@@ -60,8 +60,20 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
                 context.ChangeTargetPlayerSettingsConfigurationType(PlayerSettingsSO.EPlayerConfigurationType.Off);
                 
                 break;
+            
+            case ApplicationManager.EApplicationState.Running:
+                
+                if (ApplicationManager.Instance.CurrentState.State ==
+                    ApplicationManager.EApplicationState.LoadingScene)
+                {
+                    // if coming from loading scene, set players settings from active scene settings SO
+                    context.SetPlayersSettings(ApplicationManager.Instance.ActiveSceneSettings.PlayerManagerSettings);
+                }
+                
+                break;
         }
     }
+    
     
     protected override void OnAfterApplicationStateChange(ApplicationManager.EApplicationState toState)
     {
@@ -74,16 +86,6 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
         {
             case ApplicationManager.EApplicationState.Running:
                 
-                // if just came from loading scene
-                if ((ApplicationManager.Instance.PreviousState.State ==
-                ApplicationManager.EApplicationState.LoadingScene))
-                {
-                    // set PlayersSettings from ActiveSceneSO
-                    context.SetPlayersSettings(ApplicationManager.Instance.ActiveSceneSettings.PlayerManagerSettings);
-                }
-                
-                // todo: maybe this is extra with new player settings? V
-                
                 // if sufficient players can target player settings to default
                 if (CurrentState.State == EPlayerManagementState.SufficientPlayers)
                 {
@@ -94,8 +96,6 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
                 break;
             case ApplicationManager.EApplicationState.Paused:
                 
-                // todo: maybe this is extra with new player settings changes? V
-                
                 // if sufficient players can target player settings to alternate
                 if (CurrentState.State == EPlayerManagementState.SufficientPlayers)
                 {
@@ -105,6 +105,17 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
                 
                 break;
         }
+    }
+    
+    protected override void OnDestroy()
+    {
+        if (CurrentPlayerManagerSettings != null)
+        {
+            CurrentPlayerManagerSettings.TargetPlayerConfigurationType = PlayerSettingsSO.EPlayerConfigurationType.Off;
+        }
+        
+        
+        base.OnDestroy();
     }
 
     #endregion
@@ -311,10 +322,6 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
             
             // set default settings on init
             SetPlayersSettings(defaultPlayerManagerSettings);
-            
-            //set cursor settings initially
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
 
             return InitializedStates();
         }
@@ -685,9 +692,6 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
             
             // finally manage time scale based on new settings
             ManageTimeScale();
-
-            // ensure correct hardware cursor settings once settings being managed
-            Cursor.lockState = CursorLockMode.Confined;
             
             return;
             
@@ -739,7 +743,7 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
                         
                         // if application manager, request state change instead of directly changing timescale
                         if (playerManager.IsApplicationManager && 
-                            ApplicationManager.Instance.CurrentState != null)
+                            ApplicationManager.Instance.Started)
                         {
                             if (shouldPauseTime && 
                                 ApplicationManager.Instance.CurrentState.State !=
