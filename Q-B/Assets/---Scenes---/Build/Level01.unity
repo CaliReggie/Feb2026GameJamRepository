@@ -997,10 +997,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5069415386070361385, guid: c64edd66330b0044a8fc0e4af603b6ab, type: 3}
-      propertyPath: debugMode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5069415386070361385, guid: c64edd66330b0044a8fc0e4af603b6ab, type: 3}
       propertyPath: context.targetSceneSettings
       value: 
       objectReference: {fileID: 11400000, guid: 6f33f32e53fdb224bbc9a753a095e103, type: 2}

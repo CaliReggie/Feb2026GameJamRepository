@@ -16,7 +16,10 @@ public class GameManagerOver : GameManager.GameManagerState
         // Pause the application time
         if (ApplicationManager.Instance != null)
         {
-            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Paused);
+            if (ApplicationManager.Instance.CurrentState.State != ApplicationManager.EApplicationState.Paused)
+            {
+                ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Paused);
+            }
             
             if (Context.gameWon)
             {
@@ -63,7 +66,10 @@ public class GameManagerOver : GameManager.GameManagerState
         // resume application time
         if (ApplicationManager.Instance != null)
         {
-            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Running);
+            if (ApplicationManager.Instance.CurrentState.State != ApplicationManager.EApplicationState.Running)
+            {
+                ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Running);
+            }
         }
         else
         {

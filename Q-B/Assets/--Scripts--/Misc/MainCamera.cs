@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -27,12 +29,6 @@ public class MainCamera : StaticInstance<MainCamera>
             
             return;
         }
-        
-        // subscribe to PlayerManager settings change event
-        if (PlayerManager.Instance != null)
-        {
-            PlayerManager.Instance.OnAfterPlayerManagerSettingsChanged += OnAfterPlayerManagerSettingsChanged;
-        }
 
         ToggleCover(false);
         
@@ -54,12 +50,31 @@ public class MainCamera : StaticInstance<MainCamera>
             return true;
         }
     }
+    
+    private void Start()
+    {
+        // if PlayerManager exists subscribe to PlayerManager settings change event
+        if (PlayerManager.Instance != null)
+        {
+            PlayerManager.Instance.OnAfterPlayerManagerSettingsChange += OnAfterPlayerManagerSettingsChange;
+            
+            PlayerManager.Instance.OnAfterStateChange += OnAfterPlayerManagerStateChange;
+            
+            if (PlayerManager.Instance.Started)
+            {
+                // trigger the event manually for instant correct state
+                OnAfterPlayerManagerSettingsChange(PlayerManager.Instance.CurrentPlayerManagerSettings);
+            }
+        }
+    }
 
     protected override void OnDestroy()
     {
         if (PlayerManager.Instance != null)
         {
-            PlayerManager.Instance.OnAfterPlayerManagerSettingsChanged -= OnAfterPlayerManagerSettingsChanged;
+            PlayerManager.Instance.OnAfterPlayerManagerSettingsChange -= OnAfterPlayerManagerSettingsChange;
+            
+            PlayerManager.Instance.OnAfterStateChange -= OnAfterPlayerManagerStateChange;
         }
         
         base.OnDestroy();
@@ -88,8 +103,31 @@ public class MainCamera : StaticInstance<MainCamera>
         }
     }
     
-    private void OnAfterPlayerManagerSettingsChanged(PlayerManagerSettingsSO currentPlayerManagerSettings)
+    private void OnAfterPlayerManagerStateChange(PlayerManager.EPlayerManagementState toState)
     {
+        switch (toState)
+        {
+            case PlayerManager.EPlayerManagementState.SufficientPlayers:
+                CheckPlayerManagerSettingsForCover(PlayerManager.Instance.CurrentPlayerManagerSettings);
+                break;
+        }
+    }
+    
+    private void OnAfterPlayerManagerSettingsChange(PlayerManagerSettingsSO currentPlayerManagerSettings)
+    {
+        CheckPlayerManagerSettingsForCover(currentPlayerManagerSettings);
+    }
+    
+    private void CheckPlayerManagerSettingsForCover(PlayerManagerSettingsSO currentPlayerManagerSettings)
+    {
+        StopAllCoroutines();
+        StartCoroutine(DelayedCheckPlayerManagerSettingsForCover(0.05f, currentPlayerManagerSettings));
+    }
+    
+    private IEnumerator DelayedCheckPlayerManagerSettingsForCover(float delay, PlayerManagerSettingsSO currentPlayerManagerSettings)
+    {
+        yield return new WaitForSeconds(delay);
+        
         // if a single player needs to see from main camera, disable cover
         for (int i = 0; i < currentPlayerManagerSettings.PlayersSettings.Count; i++)
         {
@@ -100,7 +138,7 @@ public class MainCamera : StaticInstance<MainCamera>
                 ToggleCover(false);
                 
                 // return if found one
-                return;
+                yield break;
             }
         }
         

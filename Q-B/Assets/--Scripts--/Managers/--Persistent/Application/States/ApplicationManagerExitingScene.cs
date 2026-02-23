@@ -36,7 +36,7 @@ public class ApplicationManagerExitingScene : ApplicationManager.ApplicationMana
             }
         }
 
-        Context.StartTransitionOutScene();
+        Context.StartExitTransitionOutScene();
     }
     
     public override void UpdateState()

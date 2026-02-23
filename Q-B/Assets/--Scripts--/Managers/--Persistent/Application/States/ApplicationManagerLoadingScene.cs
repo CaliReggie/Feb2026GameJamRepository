@@ -65,7 +65,7 @@ public class ApplicationManagerLoadingScene : ApplicationManager.ApplicationMana
             
             _didFirstValidUpdateOccur = true; // Set the flag to indicate the first valid update has occurred
 
-            Context.StartTransitionInScene();
+            Context.StartRunningTransitionInScene();
         }
     }
     

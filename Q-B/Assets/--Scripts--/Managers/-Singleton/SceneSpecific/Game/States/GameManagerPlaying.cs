@@ -18,7 +18,10 @@ public class GameManagerPlaying : GameManager.GameManagerState
         // ensure application time
         if (ApplicationManager.Instance != null)
         {
-            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Running);
+            if (ApplicationManager.Instance.CurrentState.State != ApplicationManager.EApplicationState.Running)
+            {
+                ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Running);
+            }
         }
         else
         {

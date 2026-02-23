@@ -95,7 +95,7 @@ public class PlayerInputObject : BaseStateMachine<PlayerInputObject.EPlayerInput
         // unsubscribe from player manager event if exists
         if (IsPlayerManager)
         {
-            PlayerManager.Instance.OnAfterPlayerManagerSettingsChanged -= context.OnAfterPlayerManagerSettingsChanged;
+            PlayerManager.Instance.OnAfterPlayerManagerSettingsChange -= context.OnAfterPlayerManagerSettingsChange;
         }
         
         // reset settings state when closing or quitting
@@ -390,7 +390,7 @@ public class PlayerInputObject : BaseStateMachine<PlayerInputObject.EPlayerInput
                 }
                 
                 // subscribe to player manager settings changed event, can still recover if settings change
-                PlayerManager.Instance.OnAfterPlayerManagerSettingsChanged += OnAfterPlayerManagerSettingsChanged;
+                PlayerManager.Instance.OnAfterPlayerManagerSettingsChange += OnAfterPlayerManagerSettingsChange;
             }
             // if there is no player manager, set default settings
             else
@@ -481,10 +481,10 @@ public class PlayerInputObject : BaseStateMachine<PlayerInputObject.EPlayerInput
         }
         
         /// <summary>
-        /// Gets subscribed to PlayerManager's OnAfterPlayerManagerSettingsChanged event to handle
+        /// Gets subscribed to PlayerManager's OnAfterPlayerManagerSettingsChange event to handle
         /// managing changes in the PlayerManagerSettingsSO that may affect this Pios settings.
         /// </summary>
-        public void OnAfterPlayerManagerSettingsChanged(PlayerManagerSettingsSO currentPlayerManagerSettings)
+        public void OnAfterPlayerManagerSettingsChange(PlayerManagerSettingsSO currentPlayerManagerSettings)
         {
             // on change, always first ensure that we have the correct player numbers settings
             try

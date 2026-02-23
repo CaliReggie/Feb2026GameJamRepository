@@ -26,7 +26,7 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
     /// Public event called after PlayerManagerSettingsSO is changed that other systems can subscribe to.
     /// (Such as PlayerInputObject classes to update their settings)
     /// </summary>
-    public event Action<PlayerManagerSettingsSO> OnAfterPlayerManagerSettingsChanged;
+    public event Action<PlayerManagerSettingsSO> OnAfterPlayerManagerSettingsChange;
     
     /// <summary>
     /// The current PlayerManagerSettingsSO in use by the PlayerManager.
@@ -668,7 +668,7 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
             currentPlayerManagerSettings = newPlayerManagerSettings;
             
             // invoke event for after settings changed
-            playerManager.OnAfterPlayerManagerSettingsChanged?.Invoke(currentPlayerManagerSettings);
+            playerManager.OnAfterPlayerManagerSettingsChange?.Invoke(currentPlayerManagerSettings);
         }
 
         /// <summary>
@@ -688,7 +688,7 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
             currentPlayerManagerSettings.TargetPlayerConfigurationType = configurationType;
             
             // invoke event for after settings changed
-            playerManager.OnAfterPlayerManagerSettingsChanged?.Invoke(currentPlayerManagerSettings);
+            playerManager.OnAfterPlayerManagerSettingsChange?.Invoke(currentPlayerManagerSettings);
             
             // finally manage time scale based on new settings
             ManageTimeScale();

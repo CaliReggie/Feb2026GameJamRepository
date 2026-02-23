@@ -145,6 +145,8 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
             switch (CurrentState.State)
             {
                 case EApplicationState.LoadingScene:
+                case EApplicationState.Paused:
+                case EApplicationState.Running:
                     
                     float loadingTransitionTimeLeft = context.currentTransitionTimeLeft;
                     
@@ -170,8 +172,6 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
                     if (context.currentTransitionTimeLeft <= 0f)
                     {
                         context.transitionImage.transform.position = context.uncoveredLocation.position;
-                        
-                        context.ContextCallChangeState(EApplicationState.Running);
                     }
                     
                     break;
@@ -404,16 +404,26 @@ public class ApplicationManager : BaseStateManager<ApplicationManager, Applicati
             ContextCallChangeState(EApplicationState.ExitingScene);
         }
         
-        public void StartTransitionInScene()
+        public void StartRunningTransitionInScene()
         {
             currentTransitionTimeLeft = 
                 activeSceneSettings != null ? activeSceneSettings.TransitionInDuration : 0f;
+            
+            if (applicationManager.Started && applicationManager.CurrentState.State != EApplicationState.Running)
+            {
+                ContextCallChangeState(EApplicationState.Running);
+            }
         }
         
-        public void StartTransitionOutScene()
+        public void StartExitTransitionOutScene()
         {
             currentTransitionTimeLeft = 
                 activeSceneSettings != null ? activeSceneSettings.TransitionOutDuration : 0f;
+            
+            if (applicationManager.Started && applicationManager.CurrentState.State != EApplicationState.ExitingScene)
+            {
+                ContextCallChangeState(EApplicationState.ExitingScene);
+            }
         }
 
         #endregion

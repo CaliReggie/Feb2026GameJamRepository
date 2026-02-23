@@ -249,21 +249,21 @@ public abstract class BaseStateMachine<EState> : MonoBehaviour where EState : En
     {
         if (States == null || !States.ContainsKey(toState))
         {
-            Debug.LogError($"State {toState} not found in {GetType().Name} States dictionary.");
+            Debug.LogError($"{gameObject.name}: State {toState} not found in {GetType().Name} States dictionary.");
             
             return false;
         }
         
         if (CurrentState.InvalidTransitionStates.Contains(toState))
         {
-            Debug.LogWarning($"Invalid state transition from {CurrentState.State} to {toState}");
+            Debug.LogWarning($"{gameObject.name}: Invalid state transition from {CurrentState.State} to {toState}");
             
             return false;
         }
         
         if (CurrentState.State.Equals(toState))
         {
-            Debug.LogWarning($"Blocked duplicate transition from {CurrentState.State} to {toState}");
+            Debug.LogWarning($"{gameObject.name}: Blocked duplicate transition from {CurrentState.State} to {toState}");
             
             return false;
         }
