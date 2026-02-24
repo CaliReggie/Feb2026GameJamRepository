@@ -135,26 +135,13 @@ public class PlayerObjectPioComponent : PioComponent
             // starting extension
             if (extendArmsPressed && !wasExtendArmsPressed)
             {
-                // playerArmsJoint.xDrive = new JointDrive
-                // {
-                //     positionSpring = positionSpringExtending,
-                //     positionDamper = positionDampingExtending,
-                //     maximumForce = maximumForce
-                // };
-                //
+                
                 AudioManager.Instance.PlaySfxOneShot(AudioManager.Instance.ExtendArmsSfx, 1f,
                     playerObject.position);
             }
             // stopping extension
             else if (!extendArmsPressed && wasExtendArmsPressed)
             {
-                // playerArmsJoint.xDrive = new JointDrive
-                // {
-                //     positionSpring = positionSpringNonExtending,
-                //     positionDamper = positionDampingNonExtending,
-                //     maximumForce = maximumForce
-                // };
-                //
                 AudioManager.Instance.PlaySfxOneShot(AudioManager.Instance.RetractArmsSfx, 1f,
                     playerObject.position);
             }
@@ -492,7 +479,7 @@ public class PlayerObjectPioComponent : PioComponent
         
         void ManageJointValues()
         {
-            // todo: wanna not make this every frame
+            // always loose extension forces settings when extending pressed
             if (extendArmsPressed)
             {
                 playerArmsJoint.xDrive = new JointDrive
@@ -502,8 +489,10 @@ public class PlayerObjectPioComponent : PioComponent
                     maximumForce = maximumForce
                 };
             }
+            // if not, depends
             else
             {
+                // if really close make sure stiff with non extending forces to prevent jitter
                 if (Mathf.Abs(CurrentArmActualExtension) < .75f)
                 {
                     playerArmsJoint.xDrive = new JointDrive
@@ -513,6 +502,7 @@ public class PlayerObjectPioComponent : PioComponent
                         maximumForce = maximumForce
                     };
                 }
+                // otherwise keep loose extension forces
                 else
                 {
                     playerArmsJoint.xDrive = new JointDrive
