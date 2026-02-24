@@ -9,6 +9,23 @@ using UnityEngine.UI;
 [RequireComponent(typeof(GraphicRaycaster))]
 public class GameManager : BaseStateManagerApplicationListener<GameManager, GameManager.EGameState>
 {
+    [Header("Editor Testing")]
+    
+    [SerializeField] private EGameState testTargetState;
+
+    [SerializeField]
+    private bool changeToTestTargetState;
+    
+    private void OnValidate()
+    {
+        if (changeToTestTargetState)
+        {
+            changeToTestTargetState = false;
+            
+            ChangeState(testTargetState);
+        }
+    }
+    
     /// <summary>
     /// The different states of the Game Manager.
     /// </summary>
@@ -163,12 +180,22 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         {
             case PlayerManager.EPlayerManagementState.SufficientPlayers:
                 
-                // if just got sufficient players and application manager
-                // exists and is in running state, go to Playing state
+                // if just got sufficient players and application manager exists
                 if (ApplicationManager.Instance != null &&
-                    ApplicationManager.Instance.CurrentState.State == ApplicationManager.EApplicationState.Running)
+                    ApplicationManager.Instance.Started)
                 {
-                    context.ContextCallChangeState(EGameState.Playing);
+                    // conditionally match running - playing
+                    if (ApplicationManager.Instance.CurrentState.State ==
+                        ApplicationManager.EApplicationState.Running)
+                    {
+                        context.ContextCallChangeState(EGameState.Playing);
+                    }
+                    // conditionally math paused - paused
+                    else if (ApplicationManager.Instance.CurrentState.State ==
+                             ApplicationManager.EApplicationState.Paused)
+                    {
+                        context.ContextCallChangeState(EGameState.Paused);
+                    }
                 }
                 
                 break;
@@ -180,6 +207,13 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
                 
                 break;
         }
+    }
+    
+    protected override void ChangeState(EGameState newState)
+    {
+        base.ChangeState(newState);
+        
+        testTargetState = CurrentState.State;
     }
 
     #endregion
@@ -197,7 +231,7 @@ public class GameManager : BaseStateManagerApplicationListener<GameManager, Game
         [Tooltip("The root pause page transform.")]
         public Transform pausePage;
         
-        [Tooltip("The root game lost page transform.")]
+        [Tooltip("The root game won page transform.")]
         public Transform gameWonPage;
         
         [Tooltip("The root game lost page transform.")]

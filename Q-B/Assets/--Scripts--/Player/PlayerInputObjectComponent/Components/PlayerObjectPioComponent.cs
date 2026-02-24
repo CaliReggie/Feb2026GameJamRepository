@@ -109,6 +109,12 @@ public class PlayerObjectPioComponent : PioComponent
     
     public void OnExtendArms(InputValue extendArmsButtonValue)
     {
+        if (GameManager.Instance != null &&
+            GameManager.Instance.CurrentState.State != GameManager.EGameState.Playing)
+        {
+            return;
+        }
+        
         extendArmsPressed = extendArmsButtonValue.isPressed;
         
         // if starting extend or retract, playing audio
