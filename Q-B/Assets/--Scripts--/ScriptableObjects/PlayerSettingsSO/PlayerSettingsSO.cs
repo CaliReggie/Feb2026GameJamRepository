@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.Serialization;
 
 #region PlayerSettingsSOEditor
 
@@ -38,7 +39,7 @@ public class PlayerSettingsSOEditor : Editor
 
 #region PlayerSettingsSOClass
 
-[CreateAssetMenu( fileName = "PlayerSettings", menuName = "ScriptableObjects/PlayerSettings")]
+[CreateAssetMenu( fileName = "NewPlayerSettingsSO", menuName = "ScriptableObjects/PlayerSettingsSO")]
 public class PlayerSettingsSO : ScriptableObject
 {
     #region Declarations
@@ -112,6 +113,15 @@ public class PlayerSettingsSO : ScriptableObject
     [Tooltip("The sprite used for the player cursor.")]
     [SerializeField] private Sprite cursorSprite = null;
     
+    [FormerlySerializedAs("gamepadSensitivity")]
+    [Tooltip("The sensitivity multiplier for gamepad cursor input")]
+    [Range(0.01f, 1)] [SerializeField] private float cursorSensitivity = 1f;
+
+    [Tooltip("If true, the hardware mouse will be forced to stay within screen bounds when cursor is active. " +
+             "If false, the hardware mouse can move freely (meaning freely click elsewhere / off screen), " +
+             "the cursor will still be constrained to relative player bounds.")]
+    [SerializeField] private bool realMouseClamped = true;
+    
     [Header("Dynamic Settings - DON'T MODIFY IN INSPECTOR")]
     
     [Tooltip("The current player configuration type active.")]
@@ -143,6 +153,27 @@ public class PlayerSettingsSO : ScriptableObject
     #region Properties
     
     /// <summary>
+    /// The generic "Off" configuration for where the Pio is off with no game control/effect.
+    /// </summary>
+    public static PioStateConfiguration OffConfiguration => new PioStateConfiguration();
+    
+    /// <summary>
+    /// The default player input object configuration for a Pio to be in.
+    /// </summary>
+    public PioStateConfiguration DefaultConfiguration => defaultConfiguration;
+    
+    /// <summary>
+    /// The alternate player input object configuration for a Pio to be in.
+    /// </summary>
+    
+    public PioStateConfiguration AlternateConfiguration => alternateConfiguration;
+    
+    /// <summary>
+    /// Whether manual switching between configurations is allowed.
+    /// </summary>
+    public bool AllowManualSwitching => allowManualSwitching;
+    
+    /// <summary>
     /// Whether to use the environment spawn point from an environment prefab in scene.
     /// (if false, uses spawn position and rotation below).
     /// </summary>
@@ -169,36 +200,27 @@ public class PlayerSettingsSO : ScriptableObject
     public float CameraSensitivity => cameraSensitivity;
     
     /// <summary>
-    /// The sprite used for the player cursor.
-    /// </summary>
-    public Sprite CursorSprite => cursorSprite;
-    
-    /// <summary>
     /// If true, the player object canvas will persist below the player object ui canvas when in
     /// player object ui state.
     /// </summary>
     public bool PersistentPlayerCanvas => persistentPlayerCanvas;
     
     /// <summary>
-    /// The generic "Off" configuration for where the Pio is off with no game control/effect.
+    /// The sprite used for the player cursor.
     /// </summary>
-    public static PioStateConfiguration OffConfiguration => new PioStateConfiguration();
+    public Sprite CursorSprite => cursorSprite;
     
     /// <summary>
-    /// The default player input object configuration for a Pio to be in.
+    /// The sensitivity multiplier for gamepad cursor input.
     /// </summary>
-    public PioStateConfiguration DefaultConfiguration => defaultConfiguration;
+    public float CursorSensitivity => cursorSensitivity;
     
     /// <summary>
-    /// The alternate player input object configuration for a Pio to be in.
+    ///  If true, the hardware mouse will be forced to stay within screen bounds when cursor is active.
+    /// If false, the hardware mouse can move freely (meaning freely click elsewhere / off screen),
+    /// the cursor will still be constrained to relative player bounds.
     /// </summary>
-    
-    public PioStateConfiguration AlternateConfiguration => alternateConfiguration;
-    
-    /// <summary>
-    /// Whether manual switching between configurations is allowed.
-    /// </summary>
-    public bool AllowManualSwitching => allowManualSwitching;
+    public bool RealMouseClamped => realMouseClamped;
     
     /// <summary>
     /// The current player configuration type active.
@@ -233,6 +255,18 @@ public class PlayerSettingsSO : ScriptableObject
     }
     
     /// <summary>
+    /// True if the player needs to see from the main camera.
+    /// </summary>
+    public bool NeedToSeeFromMainCamera =>
+        (IsPlayerWithMainCamera || IsPlayerUiWithMainCamera || IsPlayerSceneUiWithMainCamera) || IsSceneUi;
+    
+    /// <summary>
+    /// True if the player needs to see the scene pause UI.
+    /// </summary>
+   public bool NeedToSeeScenePauseUi =>
+   ( IsPlayerUiWithMainCamera || IsPlayerSceneUi || IsSceneUi) && CurrentConfiguration.PauseTime;
+    
+    /// <summary>
     /// True if the current configuration is Player state with Main Camera type.
     /// </summary>
     private bool IsPlayerWithMainCamera =>
@@ -264,18 +298,6 @@ public class PlayerSettingsSO : ScriptableObject
     /// </summary>
     private bool IsSceneUi =>
         CurrentConfiguration.State == PlayerInputObject.EPlayerInputObjectState.SceneUi;
-    
-    /// <summary>
-    /// True if the player needs to see from the main camera.
-    /// </summary>
-    public bool NeedToSeeFromMainCamera =>
-        (IsPlayerWithMainCamera || IsPlayerUiWithMainCamera || IsPlayerSceneUiWithMainCamera) || IsSceneUi;
-    
-    /// <summary>
-    /// True if the player needs to see the scene pause UI.
-    /// </summary>
-   public bool NeedToSeeScenePauseUi =>
-   ( IsPlayerUiWithMainCamera || IsPlayerSceneUi || IsSceneUi) && CurrentConfiguration.PauseTime;
 
     #endregion
 

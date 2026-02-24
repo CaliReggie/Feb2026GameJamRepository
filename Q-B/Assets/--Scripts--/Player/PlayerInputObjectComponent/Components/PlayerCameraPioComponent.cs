@@ -2,6 +2,7 @@ using System;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// The PlayerCameraPioComponent class is responsible for managing the Pios camera system,
@@ -92,8 +93,8 @@ public class PlayerCameraPioComponent : PioComponent
     [Tooltip("The current camera type being used.")]
     [field: SerializeField] public EPlayerCameraType CurrentCameraType  { get; private set; }
     
-    [Tooltip("The sensitivity multiplier for look input")]
-    [Range(0.01f, 1)] [SerializeField] private float currentSensitivity = 1f;
+    [Tooltip("The sensitivity multiplier for camera look input")]
+    [Range(0.01f, 1)] [SerializeField] private float currentCameraSensitivity = 1f;
 
     /// <summary>
     /// The current look orientation (transform) based on the current camera type. Can be used to know
@@ -339,7 +340,7 @@ public class PlayerCameraPioComponent : PioComponent
                     }
                     
                     // set initial target rotation based on current player object euler rotation
-                    targetEulerRotation = new Vector3( 0, playerObjectComponent.CurrentObjectEulerRotation.y, 0);
+                    targetEulerRotation = new Vector3( 0, playerObjectComponent.ObjectEulerRotation.y, 0);
                     
                     enabled = true;
                 }
@@ -386,7 +387,7 @@ public class PlayerCameraPioComponent : PioComponent
             }
             
             // apply sensitivity setting
-            currentSensitivity = playerSettings.CameraSensitivity;
+            currentCameraSensitivity = playerSettings.CameraSensitivity;
         }
         catch (Exception e)
         {
@@ -530,9 +531,9 @@ public class PlayerCameraPioComponent : PioComponent
         // updating orientation rotation based on look input
         void UpdateOrientationRotation()
         {
-            targetEulerRotation.y += currentLookInput.x * currentSensitivity * Time.deltaTime;
+            targetEulerRotation.y += currentLookInput.x * currentCameraSensitivity * Time.deltaTime;
             
-            targetEulerRotation.x -= currentLookInput.y * currentSensitivity * Time.deltaTime;
+            targetEulerRotation.x -= currentLookInput.y * currentCameraSensitivity * Time.deltaTime;
             
             targetEulerRotation.x = Mathf.Clamp(targetEulerRotation.x, verticalRotRange.x, verticalRotRange.y);
             

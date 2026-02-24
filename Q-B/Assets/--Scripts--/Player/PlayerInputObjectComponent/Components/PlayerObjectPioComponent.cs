@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// The PlayerObjectPioComponent extends PioComponent to manage the player object GameObject. Includes a basic
@@ -42,11 +43,25 @@ public class PlayerObjectPioComponent : PioComponent
 
     [Header("Inscribed Settings")]
     
+    [SerializeField] private LayerMask cursorDetectionLayers;
+    
     [SerializeField] private float maxArmExtendDistance = 2f;
 
     [SerializeField] private float extendDistanceOffset = 0f;
+    
+    [SerializeField] private float positionSpringExtending = 1000f;
+    
+    [SerializeField] private float positionDampingExtending = 25f;
+    
+    [SerializeField] private float positionSpringNonExtending = 5000f;
+    
+    [SerializeField] private float positionDampingNonExtending = 0f;
 
-    [SerializeField] private LayerMask cursorDetectionLayers;
+    [SerializeField] private float rotationSpring = 2000f;
+
+    [SerializeField] private float rotationDamping = 0f;
+
+    [SerializeField] private float maximumForce = 10000f;
     
     [Header("Dynamic References - Don't Modify In Inspector")]
     
@@ -68,22 +83,14 @@ public class PlayerObjectPioComponent : PioComponent
     [SerializeField] private bool extendArmsPressed;
 
     [SerializeField] private bool wasExtendArmsPressed;
-    
-    [field: SerializeField] public Vector3 TargetCursorHitWorldPosition { get; private set; }
-    
-    public Vector3 ClampedTargetCursorHitWorldPosition
-    {
-        get
-        {
-            Vector3 directionToHit = TargetCursorHitWorldPosition - PlayerArmsRootTransform.position;
-            
-            return PlayerArmsRootTransform.position + Vector3.ClampMagnitude(directionToHit, maxArmExtendDistance);
-        }
-    }
+
+    [SerializeField] private Vector3 targetCursorHitWorldPosition;
     
     // extending the x position of joint to using this (difference in position of
     // root transform and hit point) clamped to maxArmExtendDistance
-    private float TargetArmXExtension => Mathf.Clamp(Vector3.Distance(TargetCursorHitWorldPosition, PlayerArmsRootTransform.position) + extendDistanceOffset, 0f, maxArmExtendDistance);
+    private float TargetArmXExtension => Mathf.Clamp(Vector3.Distance(targetCursorHitWorldPosition, PlayerArmsRootTransform.position) + extendDistanceOffset, 0f, maxArmExtendDistance);
+    
+    private float CurrentArmActualExtension => playerArmsJoint.transform.localPosition.x;
     
     // rotating the joint to look at the hit point using the difference in position
     // of root transform and hit point to get the angle
@@ -91,21 +98,26 @@ public class PlayerObjectPioComponent : PioComponent
     {
         get
         {
-            Vector3 directionToHit = TargetCursorHitWorldPosition - PlayerArmsRootTransform.position;
+            Vector3 directionToHit = targetCursorHitWorldPosition - PlayerArmsRootTransform.position;
             
             return -Mathf.Atan2(directionToHit.y, directionToHit.x) * Mathf.Rad2Deg;
         }
     }
     
     /// <summary>
+    /// The maximum distance a cursor can extend from the arm root / player objects before it stops extending further.
+    /// </summary>
+    public float MaxCursorDistance => maxArmExtendDistance - extendDistanceOffset;
+    
+    /// <summary>
     /// The current world position of the player object.
     /// </summary>
-    public Vector3 CurrentObjectPosition => playerObject.position;
+    public Vector3 ObjectPosition => playerObject.position;
     
     /// <summary>
     /// The current euler rotation of the player object.
     /// </summary>
-    public Vector3 CurrentObjectEulerRotation => playerObject.rotation.eulerAngles;
+    public Vector3 ObjectEulerRotation => playerObject.rotation.eulerAngles;
     
     public void OnExtendArms(InputValue extendArmsButtonValue)
     {
@@ -120,13 +132,29 @@ public class PlayerObjectPioComponent : PioComponent
         // if starting extend or retract, playing audio
         if (AudioManager.Instance != null)
         {
+            // starting extension
             if (extendArmsPressed && !wasExtendArmsPressed)
             {
+                // playerArmsJoint.xDrive = new JointDrive
+                // {
+                //     positionSpring = positionSpringExtending,
+                //     positionDamper = positionDampingExtending,
+                //     maximumForce = maximumForce
+                // };
+                //
                 AudioManager.Instance.PlaySfxOneShot(AudioManager.Instance.ExtendArmsSfx, 1f,
                     playerObject.position);
             }
+            // stopping extension
             else if (!extendArmsPressed && wasExtendArmsPressed)
             {
+                // playerArmsJoint.xDrive = new JointDrive
+                // {
+                //     positionSpring = positionSpringNonExtending,
+                //     positionDamper = positionDampingNonExtending,
+                //     maximumForce = maximumForce
+                // };
+                //
                 AudioManager.Instance.PlaySfxOneShot(AudioManager.Instance.RetractArmsSfx, 1f,
                     playerObject.position);
             }
@@ -382,13 +410,26 @@ public class PlayerObjectPioComponent : PioComponent
     private void ResetDynamicSettings()
     {
         // joint settings need to be reset
-        TargetCursorHitWorldPosition = CurrentObjectPosition; // arms tucked to body
+        extendArmsPressed = false;
+        wasExtendArmsPressed = false;
+        targetCursorHitWorldPosition = ObjectPosition; // arms tucked to body
         playerArmsJoint.targetPosition = Vector3.zero;
         playerArmsJoint.targetRotation = Quaternion.identity;
+        playerArmsJoint.xDrive = new JointDrive
+        {
+            positionSpring = positionSpringNonExtending,
+            positionDamper = positionDampingNonExtending,
+            maximumForce = maximumForce
+        };
+        playerArmsJoint.angularYZDrive = new JointDrive
+        {
+            positionSpring = rotationSpring,
+            positionDamper = rotationDamping,
+            maximumForce = maximumForce
+        };
 
         // // arm rigidbody should be reset
         // (this does get position/rotation reset because it is a free child of player object)
-        
         playerArmsRigidbody.transform.localPosition = Vector3.zero;
         playerArmsRigidbody.transform.localRotation = Quaternion.identity;
         if (!playerArmsRigidbody.isKinematic)
@@ -404,9 +445,6 @@ public class PlayerObjectPioComponent : PioComponent
             playerObjectRigidbody.linearVelocity = Vector3.zero;
             playerObjectRigidbody.angularVelocity = Vector3.zero;
         }
-        
-        extendArmsPressed = false;
-        wasExtendArmsPressed = false;
         
         HandleChangeState(EPlayerObjectState.Idle);
     }
@@ -445,7 +483,7 @@ public class PlayerObjectPioComponent : PioComponent
                 
                 if (Physics.Raycast(ray, out RaycastHit hitInfo, 10000f, cursorDetectionLayers))
                 {
-                    TargetCursorHitWorldPosition = hitInfo.point;
+                    targetCursorHitWorldPosition = hitInfo.point;
                 }
             }
             
@@ -454,6 +492,38 @@ public class PlayerObjectPioComponent : PioComponent
         
         void ManageJointValues()
         {
+            // todo: wanna not make this every frame
+            if (extendArmsPressed)
+            {
+                playerArmsJoint.xDrive = new JointDrive
+                {
+                    positionSpring = positionSpringExtending,
+                    positionDamper = positionDampingExtending,
+                    maximumForce = maximumForce
+                };
+            }
+            else
+            {
+                if (Mathf.Abs(CurrentArmActualExtension) < .75f)
+                {
+                    playerArmsJoint.xDrive = new JointDrive
+                    {
+                        positionSpring = positionSpringNonExtending,
+                        positionDamper = positionDampingNonExtending,
+                        maximumForce = maximumForce
+                    };
+                }
+                else
+                {
+                    playerArmsJoint.xDrive = new JointDrive
+                    {
+                        positionSpring = positionSpringExtending,
+                        positionDamper = positionDampingExtending,
+                        maximumForce = maximumForce
+                    };
+                }
+            }
+            
             playerArmsJoint.targetPosition = extendArmsPressed ? new Vector3(TargetArmXExtension, 0f, 0f) : Vector3.zero;
             
             playerArmsJoint.targetRotation = Quaternion.Euler(0f, 0f, TargetArmZRotation - 180);

@@ -38,7 +38,7 @@ public class SceneSettingsSOEditor : Editor
 
 #region SceneSettingsSOClass
 
-[CreateAssetMenu(fileName = "NewScene", menuName = "ScriptableObjects/Scene")]
+[CreateAssetMenu(fileName = "NewSceneSettingsSO", menuName = "ScriptableObjects/SceneSettingsSO")]
 public class SceneSettingsSO : ScriptableObject
 {
     #region Declarations

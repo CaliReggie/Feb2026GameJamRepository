@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "PlayerManagerSettings", menuName = "ScriptableObjects/PlayerManagerSettings")]
+[CreateAssetMenu(fileName = "NewPlayerManagerSettingsSO", menuName = "ScriptableObjects/PlayerManagerSettingsSO")]
 public class PlayerManagerSettingsSO : ScriptableObject
 {
     #region Declarations

@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.Processors;
 using UnityEngine.InputSystem.Users;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -28,18 +29,13 @@ public class PlayerCursorPioComponent : PioComponent
     [Tooltip("The prefab to spawn as player cursor")]
     [SerializeField] private GameObject cursorPrefab;
     
-    [FormerlySerializedAs("forceRealMouseInBounds")]
-    [Header("Inscribed Settings")]
-    
-    [Tooltip("If true, the hardware mouse will be forced to stay within bounds when cursor is active. " +
-             "If false, the hardware mouse can move freely (meaning freely click elsewhere / off bounds), " +
-             "but the cursor will still be clamped to player bounds.")]
-    [SerializeField] private bool constrainRealMouseInBounds = true;
-    
     [Header("Dynamic References - Don't Modify In Inspector")]
     
     [Tooltip("The PlayerInput component of the Pio")]
     [SerializeField] private PlayerInput pioPlayerInput;
+    
+    [Tooltip("The currently managed RectTransform references associated with the cursor GameObject")]
+    [field: SerializeField] public RectTransform CursorInstance {get; private set;}
     
     [Tooltip("The PlayerUiPioComponent of the Pio")]
     [SerializeField] private PlayerUiPioComponent playerUiPioComponent;
@@ -139,9 +135,6 @@ public class PlayerCursorPioComponent : PioComponent
             }
         }
     }
-    
-    [Tooltip("The currently managed RectTransform references associated with the cursor GameObject")]
-    [field: SerializeField] public RectTransform CursorInstance {get; private set;}
 
     [Tooltip("The mouse being managed. Either the real mouse of k&m player or virtual mouse of gamepad player")]
     private Mouse _mouse;
@@ -159,17 +152,25 @@ public class PlayerCursorPioComponent : PioComponent
     [Tooltip("If true, cursor movement is constrained to player screen bounds")]
     [SerializeField] private bool cursorConstrained;
     
-    [Tooltip("The most recently updated position of real mouse scheme")]
-    [SerializeField]
-    private Vector2 realMousePos;
+    [Tooltip("If true, the hardware mouse will be forced to stay within screen bounds when cursor is active. " +
+             "If false, the hardware mouse can move freely (meaning freely click elsewhere / off screen), " +
+             "but the cursor will still be constrained to relative player bounds.")]
+    [SerializeField] private bool realMouseClamped = true;
     
-    [Tooltip("The most recently updated direction of gamepad movement")]
-    [SerializeField]
-    private Vector2 gamepadDir;
+    [Tooltip("The most recently updated position of real mouse scheme")]
+    [SerializeField] private Vector2 realMousePos;
+    
+    [Tooltip("The most recently updated processed (applying scaling/sensitivity) direction of gamepad movement")]
+    [SerializeField] private Vector2 processedGamepadDir;
+    
+    [Tooltip("The most recently updated raw (unprocessed) direction of gamepad movement (0-1)")]
+    [SerializeField] private Vector2 rawGamepadDir;
+    
+    [Tooltip("The sensitivity multiplier for gamepad cursor input")]
+    [Range(0.01f, 1)] [SerializeField] private float currentCursorSensitivity = 1f;
     
     [Tooltip("The most recently updated bool if either control scheme click is pressed")]
-    [SerializeField]
-    private bool cursorPressed;
+    [SerializeField] private bool cursorPressed;
     
     /// <summary>
     /// Way to set the cursor sprite from other scripts if needed,
@@ -211,7 +212,26 @@ public class PlayerCursorPioComponent : PioComponent
     /// </summary>
     public void OnGamepadPoint(InputValue inputVector)
     {
-        gamepadDir = inputVector.Get<Vector2>();
+        Vector2 processedValue = inputVector.Get<Vector2>();
+
+        processedGamepadDir = processedValue;
+        
+        InputAction pointAction = pioPlayerInput.actions["GamepadPoint"];
+        
+        // Cast to generic control
+        if (pointAction.activeControl is InputControl<Vector2> vectorControl)
+        {
+            Vector2 rawValue = vectorControl.ReadUnprocessedValue();
+            
+            // scaling the magnitude so there is more range of control for smaller values
+            float rawValueMagnitude = rawValue.magnitude;
+            
+            float scaledMagnitude = Mathf.Pow(rawValueMagnitude, 3f); 
+            
+            Vector2 scaledRawValue = rawValue.normalized * scaledMagnitude;
+            
+            rawGamepadDir = scaledRawValue;
+        }
     }
     
     /// <summary>
@@ -222,7 +242,7 @@ public class PlayerCursorPioComponent : PioComponent
         cursorPressed = buttonValue.isPressed;
         
         //hide real mouse when using cursor (if constraining hardware mouse in bounds)
-        if (cursorPressed && enabled && Initialized && constrainRealMouseInBounds)
+        if (cursorPressed && enabled && Initialized && realMouseClamped)
         {
             Cursor.visible = false;
         }
@@ -315,6 +335,9 @@ public class PlayerCursorPioComponent : PioComponent
 
                 // getting cursor constrained setting from player settings
                 cursorConstrained = Pio.CurrentPlayerSettings.CurrentConfiguration.CursorConstrained;
+                
+                // getting real mouse clamped setting from player settings
+                realMouseClamped = Pio.CurrentPlayerSettings.RealMouseClamped;
                 
                 // spawning cursor from prefab if null, starting with gameObject inactive.
                 if (CursorInstance == null)
@@ -485,12 +508,17 @@ public class PlayerCursorPioComponent : PioComponent
     {
         try
         {
+            // set gamepad sensitivity from player settings
+            currentCursorSensitivity = playerSettings.CursorSensitivity;
+            
             // try to get cursor image and assign new sprite from player settings
             Image cursorImage = CursorInstance.GetComponent<Image>();
                 
             cursorImage.sprite = playerSettings.CursorSprite;
             
             cursorConstrained = playerSettings.CurrentConfiguration.CursorConstrained;
+
+            realMouseClamped = playerSettings.RealMouseClamped;
         }
         catch (Exception e)
         {
@@ -526,7 +554,7 @@ public class PlayerCursorPioComponent : PioComponent
         
         // if not constraining, don't change hardware cursor settings since player can
         // move freely and click off bounds if they want, otherwise apply settings
-        if (!constrainRealMouseInBounds) { return; }
+        if (!realMouseClamped) { return; }
         
         Cursor.visible = hardwareCursorVisible;
         
@@ -644,7 +672,9 @@ public class PlayerCursorPioComponent : PioComponent
             //matching virtual mouse to cursor
             InputState.Change(_mouse.position, startingPos);
 
-            gamepadDir = Vector2.zero;
+            processedGamepadDir = Vector2.zero;
+            
+            rawGamepadDir = Vector2.zero;
         }
     }
     
@@ -677,7 +707,7 @@ public class PlayerCursorPioComponent : PioComponent
             //updating cursor position
             AnchorCursor(clampedMousePos);
             
-            if (constrainRealMouseInBounds)
+            if (realMouseClamped)
             {
                 // did real mouse go too far?
                 bool mouseOffBounds = realMousePos != clampedMousePos;
@@ -713,8 +743,42 @@ public class PlayerCursorPioComponent : PioComponent
             //reading current virtual mouse position
             Vector2 gamepadMousePos = _mouse.position.ReadValue();
             
-            //calculating new position based on current position and input direction
-            Vector2 targetGpMousePos = gamepadMousePos + gamepadDir * Time.unscaledDeltaTime;
+            //prepping value to store for target position
+            Vector2 targetGpMousePos;
+            
+            // in playing state so gamepad cursor is confined in circle around player object
+            // relative to the player object in the raw input direction
+            if (GameManager.Instance != null && MainCamera.Instance != null)
+            {
+                if (GameManager.Instance.CurrentState.State == GameManager.EGameState.Playing)
+                {
+                    Vector3 playerObjectPosition = playerObjectPioComponent.ObjectPosition;
+                    
+                    float maxCursorDistanceFromObject = playerObjectPioComponent.MaxCursorDistance;
+                    
+                    // using the player object position, the raw input direction,
+                    // and the max distance to calculate the target position in a circle around the player object
+                    // and reflect that in screen space
+                    Vector3 targetWorldPos = playerObjectPosition + new Vector3(rawGamepadDir.x, rawGamepadDir.y, 0) *
+                        maxCursorDistanceFromObject;
+                    
+                    Vector2 targetScreenPos = MainCamera.Instance.Camera.WorldToScreenPoint(targetWorldPos);
+                    
+                    targetGpMousePos = targetScreenPos;
+                }
+                else
+                {
+                    // if not playing, just move based on current position and input direction,
+                    // not relative to player object and not confined to circle,
+                    // since player object may not be present or relevant
+                    targetGpMousePos = gamepadMousePos + processedGamepadDir * currentCursorSensitivity * Time.unscaledDeltaTime;
+                }
+            }
+            else
+            {
+                //calculating new position based on current position and processed input direction
+                targetGpMousePos = gamepadMousePos + processedGamepadDir* currentCursorSensitivity * Time.unscaledDeltaTime;
+            }
             
             //clamping new pos based on desired player cursor space (player portion or whole screen)
             Vector2 clampedTargetGpPos;
@@ -727,29 +791,6 @@ public class PlayerCursorPioComponent : PioComponent
             {
                 clampedTargetGpPos = ClampedByBounds(targetGpMousePos, mainScreenBounds[0], mainScreenBounds[1]);
             }
-            //
-            // if (GameManager.Instance != null && MainCamera.Instance != null)
-            // {
-            //     if (GameManager.Instance.CurrentState.State == GameManager.EGameState.Playing)
-            //     {
-            //         Vector3 unclampedCursorWorldPos = playerObjectPioComponent.TargetCursorHitWorldPosition;
-            //         
-            //         Vector3 clampedCursorWorldPos = playerObjectPioComponent.ClampedTargetCursorHitWorldPosition;
-            //         
-            //         if (Vector3.Distance(unclampedCursorWorldPos, clampedCursorWorldPos) > 0.01f)
-            //         {
-            //             Vector3 playerObjectPos = playerObjectPioComponent.CurrentObjectPosition;
-            //             
-            //             Vector3 direction = (clampedCursorWorldPos - playerObjectPos).normalized;
-            //             
-            //             float distance = Vector3.Distance(playerObjectPos, clampedCursorWorldPos);
-            //             
-            //             Vector3 correctedLocation = playerObjectPos + direction * distance;
-            //             
-            //             clampedTargetGpPos = MainCamera.Instance.Camera.WorldToScreenPoint( correctedLocation);
-            //         }
-            //     }
-            // }
             
             //updating virtual mouse position
             InputState.Change(_mouse.position, clampedTargetGpPos);
