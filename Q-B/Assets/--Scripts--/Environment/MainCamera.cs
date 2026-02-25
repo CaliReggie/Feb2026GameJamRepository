@@ -7,7 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(CinemachineBrain))]
 public class MainCamera : StaticInstance<MainCamera>
 {
-    [Header("Inscribed References")]
+    [Header("Base Inscribed References")]
 
     [Tooltip("The Cinemachine Brain component attached to this camera.")]
     [SerializeField] private CinemachineBrain cinBrain;

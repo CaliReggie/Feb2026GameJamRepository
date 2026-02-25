@@ -121,8 +121,18 @@ public class PlayerObjectPioComponent : PioComponent
     
     public void OnExtendArms(InputValue extendArmsButtonValue)
     {
-        if (GameManager.Instance != null &&
-            GameManager.Instance.CurrentState.State != GameManager.EGameState.Playing)
+        // not listening not in game
+        if (GameManager.Instance == null)
+        {
+            return;
+        }
+        // not listening if game not started
+        else if (!GameManager.Instance.Started)
+        {
+            return;
+        }
+        // not listening if game not in playing state
+        else if (GameManager.Instance.CurrentState.State != GameManager.EGameState.Playing)
         {
             return;
         }
@@ -349,9 +359,9 @@ public class PlayerObjectPioComponent : PioComponent
                 
                 if (sceneEnvironment != null)
                 {
-                    targetSpawnPosition = sceneEnvironment.SpawnPoint.position;
+                    targetSpawnPosition = sceneEnvironment.GetSpawnPoint(Pio.VisualIndex).position;
                     
-                    targetSpawnEulerRotation = sceneEnvironment.SpawnPoint.rotation.eulerAngles;
+                    targetSpawnEulerRotation = sceneEnvironment.GetSpawnPoint(Pio.VisualIndex).rotation.eulerAngles;
                 }
                 else
                 {
@@ -455,6 +465,8 @@ public class PlayerObjectPioComponent : PioComponent
         ManageDetectionValues();
         
         ManageJointValues();
+
+        ManageCameraTracking();
         
         ManageState();
         
@@ -517,6 +529,14 @@ public class PlayerObjectPioComponent : PioComponent
             playerArmsJoint.targetPosition = extendArmsPressed ? new Vector3(TargetArmXExtension, 0f, 0f) : Vector3.zero;
             
             playerArmsJoint.targetRotation = Quaternion.Euler(0f, 0f, TargetArmZRotation - 180);
+        }
+        
+        void ManageCameraTracking()
+        {
+            if (mainCameraReference != null && mainCameraReference is GameMainCamera gameMainCamera)
+            {
+                gameMainCamera.UpdateTrackedPosition(Pio.VisualIndex, playerObject.position);
+            }
         }
         
         void ManageState()

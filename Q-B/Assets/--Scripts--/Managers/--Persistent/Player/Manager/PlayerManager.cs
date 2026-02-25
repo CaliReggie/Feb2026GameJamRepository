@@ -66,6 +66,8 @@ public class PlayerManager : BaseStateManagerApplicationListener<PlayerManager, 
                 if (ApplicationManager.Instance.CurrentState.State ==
                     ApplicationManager.EApplicationState.LoadingScene)
                 {
+                    // todo: this gave a null ref...
+                    
                     // if going from loading scene, set players settings from active scene settings SO
                     context.SetPlayersSettings(ApplicationManager.Instance.ActiveSceneSettings.PlayerManagerSettings);
                 }

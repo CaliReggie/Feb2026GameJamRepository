@@ -20,6 +20,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/---Scenes---/Build/CoOpLevel01.unity
     guid: f243ebe245e16f841b823ef801f9580d
+  - enabled: 1
+    path: Assets/---Scenes---/Build/Level04.unity
+    guid: d302de967fb9e8a4288c987fa7c0a65c
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

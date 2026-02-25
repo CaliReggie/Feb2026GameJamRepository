@@ -52,6 +52,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6005167474301349896, guid: cda928bec01b97b45bd5d18fa3c5292e, type: 3}
+      propertyPath: spawnPoints.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6005167474301349896, guid: cda928bec01b97b45bd5d18fa3c5292e, type: 3}
+      propertyPath: 'spawnPoints.Array.data[0]'
+      value: 
+      objectReference: {fileID: 1521546054625839456}
+    - target: {fileID: 6005167474301349896, guid: cda928bec01b97b45bd5d18fa3c5292e, type: 3}
+      propertyPath: 'spawnPoints.Array.data[1]'
+      value: 
+      objectReference: {fileID: 1521546054625839456}
+    - target: {fileID: 6005167474301349896, guid: cda928bec01b97b45bd5d18fa3c5292e, type: 3}
+      propertyPath: 'spawnPoints.Array.data[2]'
+      value: 
+      objectReference: {fileID: 1521546054625839456}
+    - target: {fileID: 6005167474301349896, guid: cda928bec01b97b45bd5d18fa3c5292e, type: 3}
+      propertyPath: 'spawnPoints.Array.data[3]'
+      value: 
+      objectReference: {fileID: 1521546054625839456}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -60,6 +80,11 @@ PrefabInstance:
       addedObject: {fileID: 8043820639989828282}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cda928bec01b97b45bd5d18fa3c5292e, type: 3}
+--- !u!4 &1521546054625839456 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5397740858241640174, guid: cda928bec01b97b45bd5d18fa3c5292e, type: 3}
+  m_PrefabInstance: {fileID: 6914501683204861838}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &9006702586730147121 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2525115233100382911, guid: cda928bec01b97b45bd5d18fa3c5292e, type: 3}
