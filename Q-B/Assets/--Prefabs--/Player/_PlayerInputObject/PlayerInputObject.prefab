@@ -592,11 +592,11 @@ MonoBehaviour:
     m_Bits: 1048576
   maxArmExtendDistance: 2.5
   extendDistanceOffset: -0.375
-  positionSpringExtending: 1000
+  positionSpringExtending: 2000
   positionDampingExtending: 25
   positionSpringNonExtending: 5000
   positionDampingNonExtending: 0
-  rotationSpring: 2000
+  rotationSpring: 5000
   rotationDamping: 0
   maximumForce: 10000
   cursorPioComponentReference: {fileID: 0}
@@ -646,7 +646,7 @@ MonoBehaviour:
   currentLookInput: {x: 0, y: 0}
   targetEulerRotation: {x: 0, y: 0, z: 0}
   <CurrentCameraType>k__BackingField: 0
-  currentSensitivity: 1
+  currentCameraSensitivity: 1
 --- !u!114 &7008874213473669834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -685,6 +685,7 @@ MonoBehaviour:
   <Initialized>k__BackingField: 0
   cursorPrefab: {fileID: 6838444227996186847, guid: 2bf47dd12c88c604a8f5b2ea483f27db, type: 3}
   pioPlayerInput: {fileID: 0}
+  <CursorInstance>k__BackingField: {fileID: 0}
   playerUiPioComponent: {fileID: 0}
   playerObjectPioComponent: {fileID: 0}
   playerUiCanvas: {fileID: 0}
@@ -692,7 +693,6 @@ MonoBehaviour:
   playerUiDrawCam: {fileID: 0}
   sceneUiCanvas: {fileID: 0}
   sceneUiCanvasRectTransform: {fileID: 0}
-  <CursorInstance>k__BackingField: {fileID: 0}
   playerScreenBounds: []
   mainScreenBounds: []
   cursorConstrained: 0
@@ -700,6 +700,7 @@ MonoBehaviour:
   realMousePos: {x: 0, y: 0}
   processedGamepadDir: {x: 0, y: 0}
   rawGamepadDir: {x: 0, y: 0}
+  currentCursorSensitivity: 1
   cursorPressed: 0
 --- !u!1 &1746463524308290614
 GameObject:

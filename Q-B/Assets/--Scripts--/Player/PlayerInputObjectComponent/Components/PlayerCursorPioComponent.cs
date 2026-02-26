@@ -216,6 +216,8 @@ public class PlayerCursorPioComponent : PioComponent
 
         processedGamepadDir = processedValue;
         
+        if (pioPlayerInput == null) { return; }
+        
         InputAction pointAction = pioPlayerInput.actions["GamepadPoint"];
         
         // Cast to generic control
@@ -225,8 +227,12 @@ public class PlayerCursorPioComponent : PioComponent
             
             // scaling the magnitude so there is more range of control for smaller values
             float rawValueMagnitude = rawValue.magnitude;
+
+            if (rawValue.magnitude <= 0.1f) { return; }
             
             float scaledMagnitude = Mathf.Pow(rawValueMagnitude, 3f); 
+            
+            scaledMagnitude = Mathf.Clamp(scaledMagnitude, 0f, 1f);
             
             Vector2 scaledRawValue = rawValue.normalized * scaledMagnitude;
             
@@ -429,7 +435,7 @@ public class PlayerCursorPioComponent : PioComponent
         InputSystem.onAfterUpdate -= UpdateCursor;
 
         // if gamepad player remove virtual mouse
-        if (pioPlayerInput.currentControlScheme == GamepadScheme)
+        if (pioPlayerInput!= null && pioPlayerInput.currentControlScheme == GamepadScheme)
         {
             InputSystem.RemoveDevice(_mouse);
         }

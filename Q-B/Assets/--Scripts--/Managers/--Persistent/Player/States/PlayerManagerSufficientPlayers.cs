@@ -67,14 +67,6 @@ public class PlayerManagerSufficientPlayers : PlayerManager.InputManagerState
 
     public override void ExitState()
     {
-        // resume application time
-        if (ApplicationManager.Instance != null)
-        {
-            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Running);
-        }
-        else
-        {
-            Time.timeScale = 1f;
-        }
+
     }
 }

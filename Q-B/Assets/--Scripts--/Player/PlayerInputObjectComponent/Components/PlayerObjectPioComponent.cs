@@ -90,7 +90,7 @@ public class PlayerObjectPioComponent : PioComponent
     // root transform and hit point) clamped to maxArmExtendDistance
     private float TargetArmXExtension => Mathf.Clamp(Vector3.Distance(targetCursorHitWorldPosition, PlayerArmsRootTransform.position) + extendDistanceOffset, 0f, maxArmExtendDistance);
     
-    private float CurrentArmActualExtension => playerArmsJoint.transform.localPosition.x;
+    private float CurrentArmActualExtension => Mathf.Abs(playerArmsJoint.transform.localPosition.x);
     
     // rotating the joint to look at the hit point using the difference in position
     // of root transform and hit point to get the angle
@@ -450,6 +450,13 @@ public class PlayerObjectPioComponent : PioComponent
     {
         // cannot move if not initialized
         if (!Initialized) { return; }
+        
+        // // if 
+        // if (CurrentArmActualExtension > MaxCursorDistance && !playerArmsRigidbody.isKinematic)
+        // {
+        //     playerArmsRigidbody.linearVelocity *= .5f;
+        //     playerArmsRigidbody.angularVelocity *= .5f;
+        // }
     }
 
     private void Update()

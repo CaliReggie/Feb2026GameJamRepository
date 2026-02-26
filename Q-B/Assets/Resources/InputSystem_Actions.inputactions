@@ -410,10 +410,10 @@
                 },
                 {
                     "name": "GamepadPoint",
-                    "type": "Value",
+                    "type": "PassThrough",
                     "id": "073634c5-2ece-4e3b-bfda-507cf3f338b7",
                     "expectedControlType": "Vector2",
-                    "processors": "ScaleVector2(x=3000,y=2000)",
+                    "processors": "ScaleVector2(x=3000,y=3000)",
                     "interactions": "",
                     "initialStateCheck": true
                 },

@@ -59,8 +59,7 @@ public class ApplicationManagerLoadingScene : ApplicationManager.ApplicationMana
             //Ensure the active scene SO is set correctly
             Context.SetActiveSceneSO(Context.targetSceneSettings);
             
-            // Manually setting target scene to null (usually should use public method, but this is a safe time to
-            // do so and keep things clean)
+            // Cleaning target settings
             Context.targetSceneSettings = null;
             
             _didFirstValidUpdateOccur = true; // Set the flag to indicate the first valid update has occurred

@@ -19,10 +19,13 @@ public class PlayerManagerRemovingPlayers : PlayerManager.InputManagerState
         Context.ChangeTargetPlayerSettingsConfigurationType(PlayerSettingsSO.EPlayerConfigurationType.Off);
         
         // Pause the application time
-        if (ApplicationManager.Instance != null &&
-            ApplicationManager.Instance.Started)
+        if (ApplicationManager.Instance != null)
         {
-            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Paused);
+            if (ApplicationManager.Instance.Started &&
+                ApplicationManager.Instance.CurrentState.State == ApplicationManager.EApplicationState.Running)
+            {
+                ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Paused);
+            }
         }
         else
         {
@@ -54,10 +57,13 @@ public class PlayerManagerRemovingPlayers : PlayerManager.InputManagerState
     public override void ExitState()
     {
         // resume application time
-        if (ApplicationManager.Instance != null&&
-            ApplicationManager.Instance.Started)
+        if (ApplicationManager.Instance != null)
         {
-            ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Running);
+            if (ApplicationManager.Instance.Started &&
+                ApplicationManager.Instance.CurrentState.State == ApplicationManager.EApplicationState.Paused)
+            {
+                ApplicationManager.Instance.RequestChangeState(ApplicationManager.EApplicationState.Running);
+            }
         }
         else
         {
